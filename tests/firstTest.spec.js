@@ -54,7 +54,7 @@ test.describe.parallel('SFDC-poc', () => {
         await expect(lwcOutput).toContainText(`bardzo!`);
 
         const lwcInput = "a cypress jeszcze lepszy";
-        await page.type("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput, {delay: 50});
+        await page.type("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput, {delay: 100});
         await expect(lwcOutput).toContainText(`LWC zajebiste jest, ${lwcInput}bardzo!`);
         await page.goto(`https://brave-wolf-qm0gmg-dev-ed.lightning.force.com/secur/logout.jsp`);
     });
@@ -71,6 +71,7 @@ test.describe.parallel('SFDC-poc', () => {
         const shadowDomInputLocator = await frame.locator("recipe-hello-expressions ui-input input").first();
 
         const lwcInput = "znalazłem!";
+        await shadowDomInputLocator.first().scrollIntoViewIfNeeded()
         await shadowDomInputLocator.first().type(lwcInput);
         await expect(frame.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
     });
