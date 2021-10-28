@@ -4,10 +4,12 @@ $B = {};
 $B.username = 'dawid89dobrowolski@brave-wolf-qm0gmg.com';
 $B.password = 'Qwerty123';
 
-test.describe.parallel('SFDC-poc', () => {
+
+//test.describe.parallel('SFDC-poc', () => {
     test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page }) => {
+        test.slow();
         const appContext = "Sales Console";
-        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`);
+        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`, { waitUntil: "networkidle" });
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
         await page.type("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
@@ -44,24 +46,26 @@ test.describe.parallel('SFDC-poc', () => {
     });
 
     test('Interact with LWC', async ({ page }) => {
+        test.slow();
         const appContext = "Sales";
-        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`);
+        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`, { waitUntil: "networkidle" });
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
         await page.type("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
 
-        const lwcOutput = page.locator("//p[contains(text(), 'LWC')]");
-        await expect(lwcOutput).toContainText(`bardzo!`);
+        const lwcOutput = "//p[contains(text(), 'LWC')]";
+        await expect(page.locator(lwcOutput)).toContainText(`bardzo!`);
 
         const lwcInput = "a cypress jeszcze lepszy";
-        await page.type("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput, {delay: 100});
-        await expect(lwcOutput).toContainText(`LWC zajebiste jest, ${lwcInput}bardzo!`);
+        await page.type("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput, { noWaitAfter: false });
+        await expect(page.locator(lwcOutput)).toContainText(`LWC zajebiste jest, ${lwcInput}bardzo!`);
         await page.goto(`https://brave-wolf-qm0gmg-dev-ed.lightning.force.com/secur/logout.jsp`);
     });
 
     test('Interact with iframe and shadowDom', async ({ page }) => {
+        test.slow();
         const appContext = "Sales";
-        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`);
+        await page.goto(`https://login.salesforce.com?un=${$B.username}&pw=${$B.password}`, { waitUntil: "networkidle" });
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", { delay: 2000 });
         await page.type("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
@@ -71,9 +75,10 @@ test.describe.parallel('SFDC-poc', () => {
         const shadowDomInputLocator = await frame.locator("recipe-hello-expressions ui-input input").first();
 
         const lwcInput = "znalazłem!";
-        await shadowDomInputLocator.first().scrollIntoViewIfNeeded()
+        await shadowDomInputLocator.first().scrollIntoViewIfNeeded();
         await shadowDomInputLocator.first().type(lwcInput);
         await expect(frame.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
+        await page.goto(`https://brave-wolf-qm0gmg-dev-ed.lightning.force.com/secur/logout.jsp`);
     });
-})
+//})
 
