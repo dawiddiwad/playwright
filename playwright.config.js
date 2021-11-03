@@ -3,18 +3,18 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
   reporter: [['html', { outputFolder: 'playwright-report' }]],
-  repeatEach: 1,
-  retries: 3,
+  repeatEach: 3,
+  retries: 0,
   workers: 2,
   use: {
     headless: true,
-    viewport: { width: 1920, height: 1080 },
+    viewport: { width: 1368, height: 768 },
     ignoreHTTPSErrors: true,
     video: {
       mode: "on",
       size: {
-        width: 1920,
-        height: 1080
+        width: 600,
+        height: 400
       }
     },
   },
