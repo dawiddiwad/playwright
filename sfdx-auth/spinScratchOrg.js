@@ -27,24 +27,24 @@ function prepareOrg() {
 };
 
 async function spinOrg(){
-    // process.chdir('./salesforce-test-org');
-    // await sfdx.auth.sfdxurl.store({f: auth});
-    // const scratchOrg = await sfdx.force.org.create({
-    //     _quiet: false,
-    //     definitionfile: 'config/project-scratch-def.json',
-    //     durationdays: 1,
-    //     setalias: 'node-created'
-    // });
-    // await sfdx.force.source.push({
-    //     _quiet: false,
-    //     targetusername: scratchOrg.username
-    // });
-    // await sfdx.force.org.delete({
-    //     _quiet: false,
-    //     targetusername: scratchOrg.username,
-    //     noprompt: true
-    // }); 
-    // console.log(await sfdx.force.org.list());
+    process.chdir('./salesforce-test-org');
+    await sfdx.auth.sfdxurl.store({f: auth});
+    const scratchOrg = await sfdx.force.org.create({
+        _quiet: false,
+        definitionfile: 'config/project-scratch-def.json',
+        durationdays: 1,
+        setalias: 'node-created'
+    });
+    await sfdx.force.source.push({
+        _quiet: false,
+        targetusername: scratchOrg.username
+    });
+    await sfdx.force.org.delete({
+        _quiet: false,
+        targetusername: scratchOrg.username,
+        noprompt: true
+    }); 
+    console.log(await sfdx.force.org.list());
 }
 
 prepareOrg();
