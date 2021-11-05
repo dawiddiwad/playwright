@@ -16,29 +16,34 @@ const auth = {
 }
 
 function prepareOrg() {
-    const gitClone = exec('git clone --branch develop  https://dawid89dobrowolski%40gmail.com:Dupa7890$@github.com/dawiddiwad/salesforce-test-org.git');
+    const gitClone = exec('git clone --branch develop  https://dawid89dobrowolski%40gmail.com:Dupa7890$@github.com/dawiddiwad/salesforce-test-org.git',
+        (err, stdout, sterr) => {
+            console.log(err);
+            console.log(stdout);
+            console.log(sterr);
+        });
     gitClone.on('exit', () => spinOrg());
 };
 
 async function spinOrg(){
-    process.chdir('salesforce-test-org');
-    await sfdx.auth.sfdxurl.store({f: auth});
-    const scratchOrg = await sfdx.force.org.create({
-        _quiet: false,
-        definitionfile: 'config/project-scratch-def.json',
-        durationdays: 1,
-        setalias: 'node-created'
-    });
-    await sfdx.force.source.push({
-        _quiet: false,
-        targetusername: scratchOrg.username
-    });
-    await sfdx.force.org.delete({
-        _quiet: false,
-        targetusername: scratchOrg.username,
-        noprompt: true
-    }); 
-    console.log(await sfdx.force.org.list());
+    // process.chdir('./salesforce-test-org');
+    // await sfdx.auth.sfdxurl.store({f: auth});
+    // const scratchOrg = await sfdx.force.org.create({
+    //     _quiet: false,
+    //     definitionfile: 'config/project-scratch-def.json',
+    //     durationdays: 1,
+    //     setalias: 'node-created'
+    // });
+    // await sfdx.force.source.push({
+    //     _quiet: false,
+    //     targetusername: scratchOrg.username
+    // });
+    // await sfdx.force.org.delete({
+    //     _quiet: false,
+    //     targetusername: scratchOrg.username,
+    //     noprompt: true
+    // }); 
+    // console.log(await sfdx.force.org.list());
 }
 
 prepareOrg();
