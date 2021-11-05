@@ -16,7 +16,7 @@ const auth = {
 }
 
 function prepareOrg() {
-    const gitClone = exec('git clone --branch develop  https://dawid89dobrowolski%40gmail.com:Dupa7890$@github.com/dawiddiwad/salesforce-test-org.git',
+    const gitClone = exec('git clone --branch develop  \"https://dawid89dobrowolski%40gmail.com:Dupa7890$@github.com/dawiddiwad/salesforce-test-org.git\"',
         (err, stdout, sterr) => {
             console.log(err);
             console.log(stdout);
