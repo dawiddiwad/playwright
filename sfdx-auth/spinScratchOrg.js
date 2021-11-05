@@ -66,7 +66,7 @@ async function spinOrg(){
             targetusername: targetScratchOrg.username
         });
     } else {
-        console.log("scracth org not created or none unavailable");
+        console.log("scracth org not created or none available");
     }
     // await sfdx.force.org.delete({
     //     _quiet: false,
