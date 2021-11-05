@@ -12,7 +12,8 @@ pipelines:
             name: Build and Test
             caches:
               - node
+            image: mcr.microsoft.com/playwright:focal  
             script:
-              - npm ci
+              - npm i
               - npx playwright install
               - npx playwright test
