@@ -30,7 +30,8 @@ async function spinOrg(){
     process.chdir('./salesforce-test-org');
     await sfdx.auth.sfdxurl.store({
         _quiet: false,
-        sfdxurlfile: '../sfdx-auth/auth.json'
+        sfdxurlfile: '../sfdx-auth/auth.json',
+        setdefaultdevhubusername: true
     });
     const scratchOrg = await sfdx.force.org.create({
         _quiet: false,
