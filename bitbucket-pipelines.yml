@@ -6,8 +6,8 @@
 image: node:16
 
 pipelines:
-  default:
-    - parallel:
+  custom:
+    playwirght:
         - step:
             name: Build and Test
             caches:
@@ -21,3 +21,14 @@ pipelines:
                download: true
                paths:
                  - test-results/**
+    sfdx:
+        - step:
+            name: Spin SFDC scratch org
+            caches:
+              - node
+            image: mcr.microsoft.com/playwright:focal  
+            script:
+              - npm i
+              - npx playwright install
+              - node sfdx-auth/spinScratchOrg.js
+
