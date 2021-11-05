@@ -1,6 +1,10 @@
 const sfdx = require('sfdx-node');
 const { exec } = require('child_process');
 
+const branch = 'develop';
+const repo = 'salesforce-test-org';
+const sfdcModuleRepoLink = `"https://github.com/dawiddiwad/${repo}.git"`;
+
 const auth = {
     "status": 0,
     "result": {
@@ -16,8 +20,7 @@ const auth = {
 }
 
 function prepareOrg() {
-    const sfdcModuleRepoLink = `"https://github.com/dawiddiwad/salesforce-test-org.git"`;
-    const gitClone = exec(`git clone --branch develop  ${sfdcModuleRepoLink}`,
+    const gitClone = exec(`git clone --branch ${branch} ${sfdcModuleRepoLink}`,
         (err, stdout, sterr) => {
             console.log(err);
             console.log(stdout);
@@ -40,14 +43,20 @@ async function spinOrg(){
 
     if (orgList.scratchOrgs.lenght !== 0){
         targetScratchOrg = orgList.scratchOrgs[0];
+        orgList.scratchOrgs.forEach(scratchOrg => {
+            if (scratchOrg.alias === repo){
+                targetScratchOrg = scratchOrg;
+            }
+        });
     }
 
-    targetScratchOrg = await sfdx.force.org.create({
+    targetScratchOrg ? targetScratchOrg : await sfdx.force.org.create({
         _quiet: false,
         _rejectOnError: true,
         definitionfile: 'config/project-scratch-def.json',
+        targetdevhubusername: auth.username, 
         durationdays: 1,
-        setalias: 'node-created'
+        setalias: repo
     }).catch((error) => console.log(error));
 
     if (targetScratchOrg){
