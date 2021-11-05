@@ -3,10 +3,11 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
-  repeatEach: 1,
+  repeatEach: 3,
   retries: 2,
-  workers: 4,
+  workers: 2,
   use: {
+    actionTimeout: 10000,
     headless: true,
     viewport: { width: 1368, height: 768 },
     ignoreHTTPSErrors: true,
