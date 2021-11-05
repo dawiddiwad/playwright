@@ -2,7 +2,7 @@
 
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
-  reporter: [['html', { outputFolder: 'playwright-report' }]],
+  reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
   repeatEach: 3,
   retries: 2,
   workers: 4,
