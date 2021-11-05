@@ -17,3 +17,7 @@ pipelines:
               - npm i
               - npx playwright install
               - npx playwright test
+            artifacts:
+               download: true
+               paths:
+                 - test-results/**
