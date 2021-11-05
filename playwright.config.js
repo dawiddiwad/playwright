@@ -4,8 +4,8 @@
 const config = {
   reporter: [['html', { outputFolder: 'playwright-report' }]],
   repeatEach: 3,
-  retries: 0,
-  workers: 1,
+  retries: 2,
+  workers: 4,
   use: {
     headless: true,
     viewport: { width: 1368, height: 768 },
