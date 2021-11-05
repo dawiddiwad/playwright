@@ -37,16 +37,19 @@ async function spinOrg(){
 
     const orgList = await sfdx.force.org.list();
     let targetScratchOrg = null;
+
     if (orgList.scratchOrgs.lenght !== 0){
         targetScratchOrg = orgList.scratchOrgs[0];
-    } else {
-        targetScratchOrg = await sfdx.force.org.create({
-            _quiet: false,
-            definitionfile: 'config/project-scratch-def.json',
-            durationdays: 1,
-            setalias: 'node-created'
-        })
     }
+
+    targetScratchOrg = await sfdx.force.org.create({
+        _quiet: false,
+        _rejectOnError: true,
+        definitionfile: 'config/project-scratch-def.json',
+        durationdays: 1,
+        setalias: 'node-created'
+    }).catch((error) => console.log(error));
+
     if (targetScratchOrg){
         await sfdx.force.source.push({
             _quiet: false,
@@ -54,7 +57,7 @@ async function spinOrg(){
             targetusername: targetScratchOrg.username
         });
     } else {
-        console.log("scracth org was either not created or unavailable");
+        console.log("scracth org not created or none unavailable");
     }
     // await sfdx.force.org.delete({
     //     _quiet: false,
