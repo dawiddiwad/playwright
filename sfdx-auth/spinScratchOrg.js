@@ -28,26 +28,39 @@ function prepareOrg() {
 
 async function spinOrg(){
     process.chdir('./salesforce-test-org');
-    await sfdx.auth.sfdxurl.store({
+    const auth = await sfdx.auth.sfdxurl.store({
         _quiet: false,
         sfdxurlfile: '../sfdx-auth/auth.json',
-        setdefaultdevhubusername: true
+        setdefaultdevhubusername: true,
+        setdefaultusername: true
     });
-    const scratchOrg = await sfdx.force.org.create({
-        _quiet: false,
-        definitionfile: 'config/project-scratch-def.json',
-        durationdays: 1,
-        setalias: 'node-created'
-    });
-    await sfdx.force.source.push({
-        _quiet: false,
-        targetusername: scratchOrg.username
-    });
-    await sfdx.force.org.delete({
-        _quiet: false,
-        targetusername: scratchOrg.username,
-        noprompt: true
-    }); 
+
+    const orgList = await sfdx.force.org.list();
+    let targetScratchOrg = null;
+    if (orgList.scratchOrgs.lenght !== 0){
+        targetScratchOrg = orgList.scratchOrgs[0];
+    } else {
+        targetScratchOrg = await sfdx.force.org.create({
+            _quiet: false,
+            definitionfile: 'config/project-scratch-def.json',
+            durationdays: 1,
+            setalias: 'node-created'
+        })
+    }
+    if (targetScratchOrg){
+        await sfdx.force.source.push({
+            _quiet: false,
+            forceoverwrite: true,
+            targetusername: targetScratchOrg.username
+        });
+    } else {
+        console.log("scracth org was either not created or unavailable");
+    }
+    // await sfdx.force.org.delete({
+    //     _quiet: false,
+    //     targetusername: targetScratchOrg.username,
+    //     noprompt: true
+    // }); 
     console.log(await sfdx.force.org.list());
 }
 
