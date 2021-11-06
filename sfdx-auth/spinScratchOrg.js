@@ -30,7 +30,7 @@ async function prepareOrg() {
             console.log(stdout);
             console.log(sterr);
         });
-    //gitClone.on('exit', () => spinOrg());
+    gitClone.on('exit', () => spinOrg());
 };
 
 async function spinOrg(){
