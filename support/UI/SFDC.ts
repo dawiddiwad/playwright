@@ -10,7 +10,7 @@ enum LoginInteruption {
 export class SFDC {
     private static loginUrl:    string = 'https://CS129.salesforce.com';
     private static username:    string = 'test-zuprnchzcgfj@example.com';
-    private static password:    string = '*l5fggQrfmsyi';
+    private static password:    string = 'u*ogr3Hbwslfb';
     public  static baseUrl:     string = 'https://flow-saas-4558-dev-ed.cs129.my.salesforce.com';
     public  static baseLexUrl:  string = this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
 
