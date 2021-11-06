@@ -78,10 +78,10 @@ async function spinOrg(){
             }).password;
         }
         const credentials = {
-            loginUrl = targetScratchOrg.loginUrl,
-            username = targetScratchOrg.username,
-            password = targetScratchOrg.password,
-            baseUrl = targetScratchOrg.instanceUrl
+            loginUrl: targetScratchOrg.loginUrl,
+            username: targetScratchOrg.username,
+            password: targetScratchOrg.password,
+            baseUrl: targetScratchOrg.instanceUrl
         }
         await fs.writeFile('sfdx-auth/credentials.json', JSON.stringify(credentials), err => {
             console.log(err ? err : 'credentials created');
