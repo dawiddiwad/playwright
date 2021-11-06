@@ -48,7 +48,7 @@ async function spinOrg(){
             targetdevhubusername: auth.username, 
             durationdays: 1,
             setalias: repo
-        }).catch((error) => console.log(error));
+        });
     
         if (targetScratchOrg){
             await sfdx.force.source.push({

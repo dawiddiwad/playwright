@@ -32,7 +32,8 @@ export class SFDC {
 
     public static async init(): Promise<void>{
         return readFile('sfdx-auth/credentials.json', (err, data: any) => {
-            console.log(err ? err : 'fetched credentials.json');
+            if (err) { throw new Error(`unable to read credentials.json due to:\n${err}`); } 
+            console.log('fetched credentials.json');
             data = JSON.parse(data.toString());
             this.loginUrl = data.loginUrl;
             this.username = data.username;
