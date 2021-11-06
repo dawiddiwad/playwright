@@ -7,7 +7,7 @@ const repo = 'salesforce-test-org';
 const sfdcModuleRepoLink = `"https://github.com/dawiddiwad/${repo}.git"`;
 
 async function prepareOrg() {
-    await fs.writeFile('sfdx-auth/auth.json', process.argv[2], error => {
+    await fs.writeFile('./sfdx-auth/auth.json', process.argv[2], error => {
         if (error){
             throw new Error(`unable to save auth.josn due to:\n${error.message}`);
         }
@@ -46,7 +46,7 @@ async function spinOrg() {
     targetScratchOrg ? targetScratchOrg : await sfdx.force.org.create({
         _quiet: false,
         _rejectOnError: true,
-        definitionfile: 'config/project-scratch-def.json',
+        definitionfile: './config/project-scratch-def.json',
         targetdevhubusername: auth.username,
         durationdays: 1,
         setalias: repo
@@ -70,7 +70,7 @@ async function spinOrg() {
             password: targetScratchOrg.password,
             baseUrl: targetScratchOrg.instanceUrl
         }
-        await fs.writeFile('sfdx-auth/credentials.json', JSON.stringify(credentials), err => {
+        await fs.writeFile('./sfdx-auth/credentials.json', JSON.stringify(credentials), err => {
             console.log(err ? err : 'credentials created');
         })
     } else {
