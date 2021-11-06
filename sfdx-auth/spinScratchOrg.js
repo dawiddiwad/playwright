@@ -29,9 +29,9 @@ async function spinOrg() {
         sfdxurlfile: '../sfdx-auth/auth.json',
         setdefaultdevhubusername: true,
         setdefaultusername: true
-    });
+    }).catch(error => {throw error});
 
-    const orgList = await sfdx.force.org.list();
+    const orgList = await sfdx.force.org.list().catch(error => {throw error});;
     let targetScratchOrg = null;
 
     if (orgList.scratchOrgs.length !== 0) {
@@ -50,19 +50,19 @@ async function spinOrg() {
         targetdevhubusername: auth.username,
         durationdays: 1,
         setalias: repo
-    });
+    }).catch(error => {throw error});;
 
     if (targetScratchOrg) {
         await sfdx.force.source.push({
             _quiet: false,
             forceoverwrite: true,
             targetusername: targetScratchOrg.username
-        });
+        }).catch(error => {throw error});;
         if (!targetScratchOrg.password) {
-            targetScratchOrg.password = await sfdx.force.user.passwordGenerate({
+            targetScratchOrg.password = (await sfdx.force.user.passwordGenerate({
                 _quiet: false,
                 targetusername: targetScratchOrg.username
-            }).password;
+            }).catch(error => {throw error})).password;
         }
         const credentials = {
             loginUrl: targetScratchOrg.loginUrl,
