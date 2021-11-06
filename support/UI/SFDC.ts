@@ -8,10 +8,11 @@ enum LoginInteruption {
 }
 
 export class SFDC {
-    private static loginUrl: string = 'https://CS89.salesforce.com';
-    private static username: string = 'test-irocodf2ilgt@example.com';
-    private static password: string = 'gysAebq0(bccs';
-    public  static baseUrl:  string = 'https://business-app-7701-dev-ed.lightning.force.com';
+    private static loginUrl:    string = 'https://CS129.salesforce.com';
+    private static username:    string = 'test-zuprnchzcgfj@example.com';
+    private static password:    string = '*l5fggQrfmsyi';
+    public  static baseUrl:     string = 'https://flow-saas-4558-dev-ed.cs129.my.salesforce.com';
+    public  static baseLexUrl:  string = this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
@@ -25,7 +26,7 @@ export class SFDC {
             await page.click(Modal.skipPhoneRegistrationLink);
         }
         if (this.isOn(page, LoginInteruption.ClassicContext)){
-            await page.goto(this.baseUrl);
+            await page.goto(this.baseLexUrl);
         }
     }
 

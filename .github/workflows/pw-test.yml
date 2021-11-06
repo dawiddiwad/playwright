@@ -14,7 +14,7 @@ jobs:
       run: npx playwright install-deps
     - name: Install project dependencies
       run: npm install
-    - name: prepare scratch org
-      run: node sfdx-auth/spinScratchOrg.js
+    # - name: prepare scratch org
+    #   run: node sfdx-auth/spinScratchOrg.js
     - name: run tests
       run: npm test

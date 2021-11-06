@@ -65,6 +65,12 @@ async function spinOrg(){
             forceoverwrite: true,
             targetusername: targetScratchOrg.username
         });
+
+        const user = await sfdx.force.user.passwordGenerate({
+            _quiet: false,
+            targetusername: targetScratchOrg.username
+        })
+        console.log(user);
     } else {
         console.log("scracth org not created or none available");
     }

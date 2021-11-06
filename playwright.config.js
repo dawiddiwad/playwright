@@ -3,9 +3,9 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
-  repeatEach: 3,
-  retries: 2,
-  workers: 2,
+  repeatEach: 1,
+  retries: 0,
+  workers: 1,
   use: {
     actionTimeout: 10000,
     headless: true,
