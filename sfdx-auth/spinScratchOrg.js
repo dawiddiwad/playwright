@@ -21,8 +21,6 @@ const auth = {
 }
 
 async function prepareOrg() {
-    //process.argv[2]
-    //JSON.stringify(auth)
     await fs.writeFile('sfdx-auth/auth.json', process.argv[2], err => {
         console.log(err ? err : 'auth.json saved');
     })
@@ -32,7 +30,7 @@ async function prepareOrg() {
             console.log(stdout);
             console.log(sterr);
         });
-    gitClone.on('exit', () => spinOrg());
+    //gitClone.on('exit', () => spinOrg());
 };
 
 async function spinOrg(){
@@ -47,7 +45,7 @@ async function spinOrg(){
     const orgList = await sfdx.force.org.list();
     let targetScratchOrg = null;
 
-    if (orgList.scratchOrgs.lenght !== 0){
+    if (orgList.scratchOrgs.length !== 0){
         targetScratchOrg = orgList.scratchOrgs[0];
         orgList.scratchOrgs.forEach(scratchOrg => {
             if (scratchOrg.alias === repo){
