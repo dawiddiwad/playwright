@@ -75,7 +75,7 @@ async function spinOrg() {
             throw new Error("scracth orgs not available");
         }
     } catch (error) {
-        console.log(`unable to spinup scratch orgs due to:\n${error.message}`);
+        throw new Error(`unable to spinup scratch orgs due to:\n${error.message}`);
     }
 }
 
