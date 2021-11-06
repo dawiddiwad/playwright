@@ -12,10 +12,13 @@ export class SFDC {
     private static  username:   string = '';
     private static  password:   string = '';
     public  static  baseUrl:    string = '';
-    public  static  baseLexUrl: string = this.baseUrl ? this.baseUrl.replace('my.salesforce.com', 'lightning.force.com') : null;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
+    }
+
+    private static getBaseUrlForLEX(): string {
+        return this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
     }
 
     private static async checkInteruptions(page: Page): Promise<void> {
@@ -26,7 +29,7 @@ export class SFDC {
             await page.click(Modal.skipPhoneRegistrationLink);
         }
         if (this.isOn(page, LoginInteruption.ClassicContext)) {
-            await page.goto(this.baseLexUrl);
+            await page.goto(this.getBaseUrlForLEX());
         }
     }
 
@@ -37,7 +40,6 @@ export class SFDC {
             }
             console.log('fetched credentials.json');
             data = JSON.parse(data.toString());
-            console.log(JSON.stringify(data));
             this.loginUrl   = String(data.loginUrl);
             this.username   = String(data.username);
             this.password   = String(data.password);
