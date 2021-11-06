@@ -20,6 +20,11 @@ jobs:
       run: node sfdx-auth/spinScratchOrg.js ${{ secrets.DEVHUB_TOKEN }}
     - name: run tests
       run: npm test
+      uses: actions/upload-artifact@v2
+      with:
+        name: playwright-test-report
+        path: test-results/**
+        retention-days: 1
     - name: 'Upload Artifacts'
       uses: actions/upload-artifact@v2
       with:
