@@ -10,11 +10,11 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '14'
+    - name: Install operating system dependencies
+      run: npx playwright install-deps
+    - name: Install project dependencies
+      run: npm install
     - name: prepare scratch org
       run: node sfdx-auth/spinScratchOrg.js
-    # - name: Install operating system dependencies
-    #   run: npx playwright install-deps
-    # - name: Install project dependencies
-    #   run: npm install
-    # - name: run tests
-    #   run: npm test
+    - name: run tests
+      run: npm test
