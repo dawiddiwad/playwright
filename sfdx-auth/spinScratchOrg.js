@@ -36,7 +36,7 @@ async function spinOrg() {
         all: true,
         clean: true,
         json: true
-    }).catch(error => {console.error(error)});;
+    }).catch(error => {console.error(error)});
     let targetScratchOrg = null;
 
     if (orgList.scratchOrgs.length !== 0) {
@@ -46,16 +46,36 @@ async function spinOrg() {
                 targetScratchOrg = scratchOrg;
             }
         });
+    } else {
+        await sfdx.force.org.create({
+            _quiet: false,
+            _rejectOnError: true,
+            definitionfile: './config/project-scratch-def.json',
+            targetdevhubusername: auth.username,
+            durationdays: 1,
+            setalias: repo
+        }).catch(error => {console.error(error)});
+        
+        const orgList = await sfdx.force.org.list({
+            _quiet: false,
+            all: true,
+            clean: true,
+            json: true
+        }).catch(error => {console.error(error)});
+
+        if (orgList.scratchOrgs.length !== 0) {
+            targetScratchOrg = orgList.scratchOrgs[0];
+            orgList.scratchOrgs.forEach(scratchOrg => {
+                if (scratchOrg.alias === repo) {
+                    targetScratchOrg = scratchOrg;
+                }
+            });
+        } else {
+            console.error('could not find any suitable scratch orgs');
+            process.exit(1);
+        }
     }
 
-    targetScratchOrg = targetScratchOrg ? targetScratchOrg : await sfdx.force.org.create({
-        _quiet: false,
-        _rejectOnError: true,
-        definitionfile: './config/project-scratch-def.json',
-        targetdevhubusername: auth.username,
-        durationdays: 1,
-        setalias: repo
-    }).catch(error => {console.error(error)});;
 
     if (targetScratchOrg) {
         await sfdx.force.source.push({
