@@ -1,3 +1,4 @@
+const fs = require('fs');
 const sfdx = require('sfdx-node');
 const { exec } = require('child_process');
 
@@ -20,13 +21,16 @@ const auth = {
 }
 
 function prepareOrg() {
-    const gitClone = exec(`git clone --branch ${branch} ${sfdcModuleRepoLink}`,
-        (err, stdout, sterr) => {
-            console.log(err);
-            console.log(stdout);
-            console.log(sterr);
-        });
-    gitClone.on('exit', () => spinOrg());
+    fs.writeFile('yolo.json', JSON.stringify(auth), err => {
+        console.log(err);
+    })
+    // const gitClone = exec(`git clone --branch ${branch} ${sfdcModuleRepoLink}`,
+    //     (err, stdout, sterr) => {
+    //         console.log(err);
+    //         console.log(stdout);
+    //         console.log(sterr);
+    //     });
+    // gitClone.on('exit', () => spinOrg());
 };
 
 async function spinOrg(){
