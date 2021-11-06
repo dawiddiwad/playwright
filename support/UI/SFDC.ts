@@ -8,11 +8,11 @@ enum LoginInteruption {
     ClassicContext = "salesforce.com"
 }
 export class SFDC {
-    private static loginUrl: string = '';
-    private static username: string = '';
-    private static password: string = '';
-    public static baseUrl: string = '';
-    public static baseLexUrl: string = this.baseUrl ? this.baseUrl.replace('my.salesforce.com', 'lightning.force.com') : null;
+    private static  loginUrl:   string = '';
+    private static  username:   string = '';
+    private static  password:   string = '';
+    public  static  baseUrl:    string = '';
+    public  static  baseLexUrl: string = this.baseUrl ? this.baseUrl.replace('my.salesforce.com', 'lightning.force.com') : null;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
@@ -38,10 +38,10 @@ export class SFDC {
             console.log('fetched credentials.json');
             data = JSON.parse(data.toString());
             console.log(JSON.stringify(data));
-            this.loginUrl = data.loginUrl;
-            this.username = data.username;
-            this.password = data.password;
-            this.baseUrl = data.baseUrl;
+            this.loginUrl   = String(data.loginUrl);
+            this.username   = String(data.username);
+            this.password   = String(data.password);
+            this.baseUrl    = String(data.baseUrl);
         })
     }
 
