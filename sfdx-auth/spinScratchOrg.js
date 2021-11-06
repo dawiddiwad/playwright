@@ -20,17 +20,19 @@ const auth = {
     }
 }
 
-function prepareOrg() {
-    fs.writeFile('yolo.json', JSON.stringify(auth), err => {
-        console.log(err);
+async function prepareOrg() {
+    //process.argv[2]
+    //JSON.stringify(auth)
+    await fs.writeFile('sfdx-auth/auth.json', process.argv[2], err => {
+        console.log(err ? err : 'auth.json saved');
     })
-    // const gitClone = exec(`git clone --branch ${branch} ${sfdcModuleRepoLink}`,
-    //     (err, stdout, sterr) => {
-    //         console.log(err);
-    //         console.log(stdout);
-    //         console.log(sterr);
-    //     });
-    // gitClone.on('exit', () => spinOrg());
+    const gitClone = exec(`git clone --branch ${branch} ${sfdcModuleRepoLink}`,
+        (err, stdout, sterr) => {
+            console.log(err);
+            console.log(stdout);
+            console.log(sterr);
+        });
+    gitClone.on('exit', () => spinOrg());
 };
 
 async function spinOrg(){
@@ -70,12 +72,20 @@ async function spinOrg(){
             targetusername: targetScratchOrg.username
         });
         if (!targetScratchOrg.password){
-            const user = await sfdx.force.user.passwordGenerate({
+            targetScratchOrg.password = await sfdx.force.user.passwordGenerate({
                 _quiet: false,
                 targetusername: targetScratchOrg.username
-            })
-            console.log(user);
+            }).password;
         }
+        const credentials = {
+            loginUrl = targetScratchOrg.loginUrl,
+            username = targetScratchOrg.username,
+            password = targetScratchOrg.password,
+            baseUrl = targetScratchOrg.instanceUrl
+        }
+        await fs.writeFile('sfdx-auth/credentials.json', JSON.stringify(credentials), err => {
+            console.log(err ? err : 'credentials created');
+        })
     } else {
         console.log("scracth org not created or none available");
     }

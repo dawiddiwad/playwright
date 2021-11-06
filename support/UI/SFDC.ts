@@ -1,18 +1,18 @@
 import { Page } from "@playwright/test";
 import { Modal } from "./Modal";
+import { readFile } from "fs";
 
 enum LoginInteruption {
     ConfirmIdentity = "LoginInterstitial",
     RegisterPhone   = "AddPhoneNumber",
     ClassicContext  = "salesforce.com"
 }
-
 export class SFDC {
-    private static loginUrl:    string = 'https://CS129.salesforce.com';
-    private static username:    string = 'test-zuprnchzcgfj@example.com';
-    private static password:    string = 'u*ogr3Hbwslfb';
-    public  static baseUrl:     string = 'https://flow-saas-4558-dev-ed.cs129.my.salesforce.com';
-    public  static baseLexUrl:  string = this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
+    private static loginUrl:    string = '';
+    private static username:    string = '';
+    private static password:    string = '';
+    public  static baseUrl:     string = '';
+    public  static baseLexUrl:  string = this.baseUrl ? this.baseUrl.replace('my.salesforce.com', 'lightning.force.com') : null;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
@@ -28,6 +28,17 @@ export class SFDC {
         if (this.isOn(page, LoginInteruption.ClassicContext)){
             await page.goto(this.baseLexUrl);
         }
+    }
+
+    public static async init(): Promise<void>{
+        return readFile('sfdx-auth/credentials.json', (err, data: any) => {
+            console.log(err ? err : 'fetched credentials.json');
+            data = JSON.parse(data.toString());
+            this.loginUrl = data.loginUrl;
+            this.username = data.username;
+            this.password = data.password;
+            this.baseUrl = data.baseUrl;
+        })
     }
 
     public static async login (page: Page): Promise<void> {

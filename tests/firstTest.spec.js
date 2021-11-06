@@ -6,6 +6,9 @@ const { SFDC } = require('../support/UI/SFDC');
 const { NavigationBar } = require('../support/UI/NavigationBar');
 
 test.describe.parallel('SFDC-poc', () => {
+    test.beforeAll(async () => {
+        await SFDC.init();
+    })
     test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page }) => {
         test.slow();
         const salesConsole = "Sales Console";
