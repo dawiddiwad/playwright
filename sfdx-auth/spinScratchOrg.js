@@ -29,14 +29,14 @@ async function spinOrg() {
         sfdxurlfile: '../sfdx-auth/auth.json',
         setdefaultdevhubusername: true,
         setdefaultusername: true
-    }).catch(error => {throw error});
+    }).catch(error => {console.error(error)});
 
     const orgList = await sfdx.force.org.list({
         _quiet: false,
         all: true,
         clean: true,
         json: true
-    }).catch(error => {throw error});;
+    }).catch(error => {console.error(error)});;
     let targetScratchOrg = null;
 
     if (orgList.scratchOrgs.length !== 0) {
@@ -55,19 +55,21 @@ async function spinOrg() {
         targetdevhubusername: auth.username,
         durationdays: 1,
         setalias: repo
-    }).catch(error => {throw error});;
+    }).catch(error => {console.error(error)});;
 
     if (targetScratchOrg) {
         await sfdx.force.source.push({
             _quiet: false,
             forceoverwrite: true,
             targetusername: targetScratchOrg.username
-        }).catch(error => {throw error});;
+        }).catch(error => {console.error(error)});;
         if (!targetScratchOrg.password) {
-            targetScratchOrg.password = (await sfdx.force.user.passwordGenerate({
+            const user = await sfdx.force.user.passwordGenerate({
                 _quiet: false,
+                targetdevhubusername: auth.username,
                 targetusername: targetScratchOrg.username
-            }).catch(error => {throw error})).password;
+            }).catch(error => {console.error(error)});
+            targetScratchOrg.password = user.password;
         }
         const credentials = {
             loginUrl: targetScratchOrg.loginUrl,
