@@ -19,7 +19,7 @@ async function prepareOrg() {
     gitClone.on('exit', () => spinOrg());
 };
 
-async function spinOrg(){
+async function spinOrg() {
     try {
         process.chdir('./salesforce-test-org');
         const auth = await sfdx.auth.sfdxurl.store({
@@ -28,35 +28,35 @@ async function spinOrg(){
             setdefaultdevhubusername: true,
             setdefaultusername: true
         });
-    
+
         const orgList = await sfdx.force.org.list();
         let targetScratchOrg = null;
-    
-        if (orgList.scratchOrgs.length !== 0){
+
+        if (orgList.scratchOrgs.length !== 0) {
             targetScratchOrg = orgList.scratchOrgs[0];
             orgList.scratchOrgs.forEach(scratchOrg => {
-                if (scratchOrg.alias === repo){
+                if (scratchOrg.alias === repo) {
                     targetScratchOrg = scratchOrg;
                 }
             });
         }
-    
+
         targetScratchOrg ? targetScratchOrg : await sfdx.force.org.create({
             _quiet: false,
             _rejectOnError: true,
             definitionfile: 'config/project-scratch-def.json',
-            targetdevhubusername: auth.username, 
+            targetdevhubusername: auth.username,
             durationdays: 1,
             setalias: repo
         });
-    
-        if (targetScratchOrg){
+
+        if (targetScratchOrg) {
             await sfdx.force.source.push({
                 _quiet: false,
                 forceoverwrite: true,
                 targetusername: targetScratchOrg.username
             });
-            if (!targetScratchOrg.password){
+            if (!targetScratchOrg.password) {
                 targetScratchOrg.password = await sfdx.force.user.passwordGenerate({
                     _quiet: false,
                     targetusername: targetScratchOrg.username
@@ -74,8 +74,8 @@ async function spinOrg(){
         } else {
             throw new Error("scracth orgs not available");
         }
-    } catch (error){
-        console.log(`unable to spinup scratch orgs due to:\n${error}`);
+    } catch (error) {
+        console.log(`unable to spinup scratch orgs due to:\n${error.message}`);
     }
 }
 
