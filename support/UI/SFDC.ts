@@ -37,6 +37,7 @@ export class SFDC {
             }
             console.log('fetched credentials.json');
             data = JSON.parse(data.toString());
+            console.log(JSON.stringify(data));
             this.loginUrl = data.loginUrl;
             this.username = data.username;
             this.password = data.password;
