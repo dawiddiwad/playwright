@@ -17,7 +17,7 @@ jobs:
     - name: Install PW
       run: npx playwright install   
     - name: prepare credentials for sandbox org
-      run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }} 
+      run: npx ts-node sfdx-auth/authSandbox.ts '${{ secrets.DEVHUB_TOKEN }}' '${{ secrets.SANDBOX_PASS }}'
     - name: run tests
       run: npm test
     - uses: actions/upload-artifact@v2
