@@ -16,7 +16,7 @@ jobs:
       run: npm install
     - name: Install PW and copy auth.json
       run: npx playwright install
-    - uses: DamianReeves/write-file-action
+    - uses: DamianReeves/write-file-action@v1.0
       with:
         path: sfdx-auth/auth.json
         contents: ${{ secrets.DEVHUB_TOKEN }}     
