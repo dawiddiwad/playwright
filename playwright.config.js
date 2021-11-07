@@ -9,13 +9,13 @@ const config = {
   use: {
     actionTimeout: 10000,
     headless: true,
-    viewport: { width: 1368, height: 768 },
+    viewport: { width: 1366, height: 768 },
     ignoreHTTPSErrors: true,
     video: {
       mode: "on",
       size: {
-        width: 600,
-        height: 400
+        width: 683,
+        height: 384
       }
     },
   },
