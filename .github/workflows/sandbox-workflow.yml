@@ -22,7 +22,7 @@ jobs:
       if: ${{ failure() }}
       with:
         name: playwright-test-report
-        path: sfdc-auth/**
+        path: sfdx-auth/**
         retention-days: 1
     - name: run tests
       run: npm test
