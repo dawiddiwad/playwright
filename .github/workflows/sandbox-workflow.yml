@@ -20,9 +20,8 @@ jobs:
       run: node sfdx-auth/authSandbox.js ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }} 
     - name: run tests
       run: npm test
-      continue-on-error: true
-    - name: 'Upload Artifacts'
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2
+      if: ${{ failure() }}
       with:
         name: playwright-test-report
         path: test-results/**

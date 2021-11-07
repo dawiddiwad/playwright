@@ -12,7 +12,7 @@ const config = {
     viewport: { width: 1366, height: 768 },
     ignoreHTTPSErrors: true,
     video: {
-      mode: "on",
+      mode: "retain-on-failure",
       size: {
         width: 683,
         height: 384
