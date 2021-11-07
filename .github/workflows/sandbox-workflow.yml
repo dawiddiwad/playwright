@@ -15,9 +15,9 @@ jobs:
     # - name: Install operating system dependencies
     #   run: npx playwright install-deps
     - name: Install project dependencies
-      run: sudo npm install
+      run: npm install
     - name: Install PW
-      run: sudo npx playwright install   
+      run: npx playwright install   
     - name: prepare credentials for sandbox org
       run: sudo npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
     - name: run tests
