@@ -15,11 +15,7 @@ jobs:
     - name: Install project dependencies
       run: npm install
     - name: Install PW and copy auth.json
-      run: npx playwright install
-    - uses: DamianReeves/write-file-action@v1.0
-      with:
-        path: ${{env.GITHUB_WORKSPACE}}/sfdx-auth/auth.json
-        contents: ${{ secrets.DEVHUB_TOKEN }}     
+      run: npx playwright install   
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }} 
     - name: run tests

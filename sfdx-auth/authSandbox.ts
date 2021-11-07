@@ -4,7 +4,7 @@ const sfdx = Client.createUsingPath('sfdx');
 
 async function readAuth() {
     console.log('[step 1/5] fetching auth token...');
-    await writeFile('./sfdx-auth/auth.json', process.argv[2]);
+    await writeFile('./sfdx-auth/auth.json',`{"sfdxAuthUrl": "${process.argv[2]}"}`);
 }
 
 async function authorize() {
@@ -41,7 +41,7 @@ async function generateCredentials() {
 (async () => {
     console.log('generating sandbox credentials in 5 steps:')
     try{
-        //await readAuth();
+        await readAuth();
         await authorize();
         await generateCredentials();
     } catch (errors) {
