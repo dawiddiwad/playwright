@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e-tests:
+  scratch-org-tests:
     runs-on: ubuntu-latest # or macos-latest, windows-latest
 
     steps:
