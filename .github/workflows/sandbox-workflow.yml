@@ -18,7 +18,7 @@ jobs:
       run: npx playwright install
     - uses: DamianReeves/write-file-action@v1.0
       with:
-        path: sfdx-auth/auth.json
+        path: ${{GITHUB_WORKSPACE}}/sfdx-auth/auth.json
         contents: ${{ secrets.DEVHUB_TOKEN }}     
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }} 
