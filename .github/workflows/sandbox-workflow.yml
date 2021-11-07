@@ -14,16 +14,10 @@ jobs:
     #   run: npx playwright install-deps
     - name: Install project dependencies
       run: npm install
-    - name: Install PW and copy auth.json
+    - name: Install PW
       run: npx playwright install   
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }} 
-    - uses: actions/upload-artifact@v2
-      if: ${{ failure() }}
-      with:
-        name: playwright-test-report
-        path: sfdx-auth/**
-        retention-days: 1
     - name: run tests
       run: npm test
     - uses: actions/upload-artifact@v2
