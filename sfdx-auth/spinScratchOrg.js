@@ -8,7 +8,7 @@ const sfdcModuleRepoLink = `"https://github.com/dawiddiwad/${repo}.git"`;
 
 async function prepareOrg() {
     await fs.writeFile('./sfdx-auth/auth.json', process.argv[2], error => {
-        if (error){
+        if (error) {
             throw new Error(`unable to save auth.josn due to:\n${error.message}`);
         }
         console.log('auth.json saved');
@@ -29,14 +29,14 @@ async function spinOrg() {
         sfdxurlfile: '../sfdx-auth/auth.json',
         setdefaultdevhubusername: true,
         setdefaultusername: true
-    }).catch(error => {console.error(error)});
+    }).catch(error => { console.error(error); process.exit(1); });
 
     const orgList = await sfdx.force.org.list({
         _quiet: false,
         all: true,
         clean: true,
         json: true
-    }).catch(error => {console.error(error)});
+    }).catch(error => { console.error(error); process.exit(1); });
     let targetScratchOrg = null;
 
     if (orgList.scratchOrgs.length !== 0) {
@@ -54,14 +54,14 @@ async function spinOrg() {
             targetdevhubusername: auth.username,
             durationdays: 1,
             setalias: repo
-        }).catch(error => {console.error(error)});
-        
+        }).catch(error => { console.error(error); process.exit(1); });
+
         const orgList = await sfdx.force.org.list({
             _quiet: false,
             all: true,
             clean: true,
             json: true
-        }).catch(error => {console.error(error)});
+        }).catch(error => { console.error(error); process.exit(1); });
 
         if (orgList.scratchOrgs.length !== 0) {
             targetScratchOrg = orgList.scratchOrgs[0];
@@ -76,19 +76,18 @@ async function spinOrg() {
         }
     }
 
-
     if (targetScratchOrg) {
         await sfdx.force.source.push({
             _quiet: false,
             forceoverwrite: true,
             targetusername: targetScratchOrg.username
-        }).catch(error => {console.error(error)});;
+        }).catch(error => { console.error(error); process.exit(1); });
         if (!targetScratchOrg.password) {
             const user = await sfdx.force.user.passwordGenerate({
                 _quiet: false,
                 targetdevhubusername: auth.username,
                 targetusername: targetScratchOrg.username
-            }).catch(error => {console.error(error)});
+            }).catch(error => { console.error(error); process.exit(1); });
             targetScratchOrg.password = user.password;
         }
         const credentials = {
