@@ -15,7 +15,9 @@ jobs:
     - name: Install project dependencies
       run: npm install
     - name: Install PW
-      run: npx playwright install      
+      run: npx playwright install 
+    - name: install sfdx cli
+      run: sudo npm install sfdx-cli --global     
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
     - name: run tests
