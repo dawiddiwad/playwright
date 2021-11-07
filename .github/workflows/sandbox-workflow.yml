@@ -4,8 +4,6 @@ on:
 jobs:
   sandbox-org-tests:
     runs-on: ubuntu-latest # or macos-latest, windows-latest ubuntu-latest
-    container:
-      image: salesforce/salesforcedx:latest-full
 
     steps:
     - uses: actions/checkout@v2
@@ -19,7 +17,7 @@ jobs:
     - name: Install PW
       run: npx playwright install   
     - name: prepare credentials for sandbox org
-      run: sudo npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
+      run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
     - name: run tests
       run: sudo npm test
     - uses: actions/upload-artifact@v2
