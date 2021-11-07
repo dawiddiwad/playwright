@@ -41,8 +41,8 @@ async function generateCredentials() {
 (async () => {
     console.log('generating sandbox credentials in 5 steps:')
     try{
-        await readAuth();
-        await authorize();
+        //await readAuth();
+        //await authorize();
         await generateCredentials();
     } catch (errors) {
         console.error(`unable to generate sandbox credentials due to:\n${errors}`); 

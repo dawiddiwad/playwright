@@ -16,6 +16,8 @@ jobs:
       run: npm install
     - name: Install PW
       run: npx playwright install   
+    - name: debug
+      run: export SFDC_ACCESS_TOKEN=5Aep861R85s7ZWXls0rEc6bm3J7cI4z8F10ckoY2BzSeqoHa6wIBeWhs0YjGkEfTB.DUNSTJK07JjHHwJOeOs1R!00D0900000B27xBEAR      
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts '${{ secrets.DEVHUB_TOKEN }}' '${{ secrets.SANDBOX_PASS }}'
     - name: run tests
