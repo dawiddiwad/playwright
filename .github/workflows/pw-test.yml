@@ -2,14 +2,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  scratch-org-tests:
+  e2e-tests:
     runs-on: ubuntu-latest # or macos-latest, windows-latest
 
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '14'
     # - name: Install operating system dependencies
     #   run: npx playwright install-deps
     - name: Install project dependencies
