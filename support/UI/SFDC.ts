@@ -38,7 +38,6 @@ export class SFDC {
             if (error) { 
                 throw new Error(`unable to read credentials.json due to:\n${error.message}`); 
             }
-            console.log('fetched credentials.json');
             data = JSON.parse(data.toString());
             this.loginUrl   = String(data.loginUrl);
             this.username   = String(data.username);
