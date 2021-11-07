@@ -16,6 +16,8 @@ jobs:
       run: npm install
     - name: Install PW
       run: npx playwright install 
+    - name: debug
+      run: sudo chown -R 65534:121 "/root/.npm"
     - name: install sfdx cli
       run: sudo npm install sfdx-cli --global     
     - name: prepare credentials for sandbox org
