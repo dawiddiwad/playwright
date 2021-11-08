@@ -4,13 +4,13 @@ const sfdx = Client.createUsingPath('sfdx');
 
 async function readAuth() {
     console.log('[step 1/5] fetching auth token...');
-    await writeFile('sfdx-auth/auth.json',`{"sfdxAuthUrl": "${process.argv[2]}"}`);
+    await writeFile('./sfdx-auth/auth.json',`{"sfdxAuthUrl": "${process.argv[2]}"}`);
 }
 
 async function authorize() {
     console.log('[step 2/5] authorizing org...');
     await sfdx.auth.sfdxurlStore({
-        sfdxurlfile: 'sfdx-auth/auth.json',
+        sfdxurlfile: './sfdx-auth/auth.json',
         setdefaultdevhubusername: true,
         setdefaultusername: true
     });
@@ -35,14 +35,14 @@ async function generateCredentials() {
     }
 
     console.log('[step 5/5] writing credentials file...');
-    await writeFile('sfdx-auth/credentials.json', JSON.stringify(credentials));
+    await writeFile('./sfdx-auth/credentials.json', JSON.stringify(credentials));
 }
 
 (async () => {
     console.log('generating sandbox credentials in 5 steps:')
     try{
-        await readAuth();
-        await authorize();
+        //await readAuth();
+        //await authorize();
         await generateCredentials();
     } catch (errors) {
         console.error(`unable to generate sandbox credentials due to:\n${errors}`); 
