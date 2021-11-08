@@ -10,27 +10,18 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '16'
-    # - name: install SFDX CLI and prepare credentials for sandbox org
-    #   run: |
-    #     wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-    #     mkdir ~/sfdx
-    #     tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-    #     export PATH=~/sfdx/bin:$PATH
-    #     sfdx plugins --core
-    #     npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
-    - name: Install SFDX CLI and prepare credentials for sandbox org
-      run: |
-        wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-        mkdir ~/sfdx
-        tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-        echo "$HOME/sfdx/bin" >> $GITHUB_PATH
-        sfdx plugins --core
     - name: Install project dependencies
       run: npm install
     - name: Install PW
       run: npx playwright install   
-    - name: Prepare credentials for sandbox org
-      run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
+    - name: install SFDX CLI and prepare credentials for sandbox org
+      run: |
+        wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+        mkdir ~/sfdx
+        tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+        export PATH=~/sfdx/bin:$PATH
+        sfdx plugins --core
+        npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
     - name: Run tests
       run: npm test
     - uses: actions/upload-artifact@v2
