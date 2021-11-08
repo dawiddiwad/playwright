@@ -3,7 +3,7 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
-  repeatEach: 20,
+  repeatEach: 1,
   retries: 2,
   workers: 2,
   use: {
@@ -12,7 +12,7 @@ const config = {
     viewport: { width: 1366, height: 768 },
     ignoreHTTPSErrors: true,
     video: {
-      mode: "on",
+      mode: "retain-on-failure",
       size: {
         width: 683,
         height: 384

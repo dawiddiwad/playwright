@@ -16,7 +16,7 @@ test.describe.parallel('SFDC-poc', () => {
         const overdueTasks = "Overdue Tasks";
         await SFDC.login(page);        
         await page.click(NavigationBar.appLauncherIcon, {delay:2000});
-        await page.type(NavigationBar.appLauncherSearch, salesConsole);
+        await page.fill(NavigationBar.appLauncherSearch, salesConsole);
         await page.click(NavigationBar.selectApplication(salesConsole));
         await page.click(NavigationBar.tabsNavigationMenu);
         await page.click(NavigationBar.tabsNavigationMenuItem("Tasks"));
@@ -30,7 +30,7 @@ test.describe.parallel('SFDC-poc', () => {
         await page.click(Details.newTaskButton);
         await page.click("//a[ancestor::*[preceding-sibling::span[descendant::*[contains(text(), 'Status')]]]]");
         await page.click(`//a[contains(@title, 'In Progress')]`);
-        await page.type("//input[ancestor::*[preceding-sibling::label[contains(text(), 'Subject')]]]", taskSubject);
+        await page.fill("//input[ancestor::*[preceding-sibling::label[contains(text(), 'Subject')]]]", taskSubject);
         await page.click("//button[@title = 'Save']");
         const saveConfirmToast = page.locator("//div[contains(@class, 'slds-notify--toast')]");
         await expect(saveConfirmToast).toContainText(`Task ${taskSubject} was created.`);
@@ -55,7 +55,7 @@ test.describe.parallel('SFDC-poc', () => {
         const appContext = "Sales";
         await SFDC.login(page);
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
-        await page.type("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
+        await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
 
         const lwcOutput = "//p[contains(text(), 'LWC')]";
@@ -73,7 +73,7 @@ test.describe.parallel('SFDC-poc', () => {
 
         await SFDC.login(page);
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", { delay: 2000 });
-        await page.type("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
+        await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
 
         const elementHandle = await page.locator("//c-hello-world//iframe").elementHandle();
