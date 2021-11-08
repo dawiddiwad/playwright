@@ -23,7 +23,7 @@ jobs:
         wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
         mkdir ~/sfdx
         tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-        echo "~/sfdx/bin" >> $GITHUB_PATH
+        echo "$HOME/sfdx/bin" >> $GITHUB_PATH
         sfdx plugins --core
     - name: Install project dependencies
       run: npm install
