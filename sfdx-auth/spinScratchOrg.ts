@@ -6,6 +6,7 @@ const sfdx = Client.createUsingPath('sfdx');
 const branch                =   'develop';
 const repo                  =   'salesforce-test-org';
 const sfdcModuleRepoLink    =   `"https://github.com/dawiddiwad/${repo}.git"`;
+let maxTries                =   2;
 
 async function cloneComponentRepo() {
     return new Promise<string>((repoCloned, failure) => {
@@ -34,42 +35,46 @@ async function authorize() {
 }
 
 async function prepareScratchOrg(): Promise<any> {
-    console.log('[step 4/5] preparing scratch org...');
-    const orgList: any = await sfdx.org.list({
-        noprompt:   true,
-        all:        true,
-        clean:      true,
-        json:       true
-    });
-
-    const devHub = orgList.result.nonScratchOrgs[0];
-    let scratchOrg = null;
-
-    if (orgList.result.scratchOrgs.length === 0){
-        await spinNewScratchOrg(devHub.username);
-        return prepareScratchOrg();
-    } else{
-        scratchOrg = orgList.result.scratchOrgs[0];
+    if(maxTries-->0){
+        console.log('[step 4/5] preparing scratch org...');
+        const orgList: any = await sfdx.org.list({
+            noprompt:   true,
+            all:        true,
+            clean:      true,
+            json:       true
+        });
+    
+        const devHub = orgList.result.nonScratchOrgs[0];
+        let scratchOrg = null;
+    
+        if (orgList.result.scratchOrgs.length === 0){
+            await spinNewScratchOrg(devHub.username);
+            return prepareScratchOrg();
+        } else{
+            scratchOrg = orgList.result.scratchOrgs[0];
+        }
+    
+        if (!scratchOrg.password){
+            scratchOrg.password = (await setScratchOrgPassword(devHub.username, scratchOrg.username)).result.password;
+        }
+    
+        console.log('\tpushing sources...');
+        process.chdir('./salesforce-test-org');
+        await sfdx.source.push({
+            forceoverwrite: true,
+            targetusername: scratchOrg.username
+        })
+        process.chdir('../');
+    
+        prepareCredentials({
+            loginUrl:   scratchOrg.loginUrl,
+            username:   scratchOrg.username,
+            password:   scratchOrg.password,
+            baseUrl:    scratchOrg.instanceUrl
+        });
+    } else {
+        throw new Error('scratchOrgs retries limit is up');
     }
-
-    if (!scratchOrg.password){
-        scratchOrg.password = (await setScratchOrgPassword(devHub.username, scratchOrg.username)).result.password;
-    }
-
-    console.log('\tpushing sources...');
-    process.chdir('./salesforce-test-org');
-    await sfdx.source.push({
-        forceoverwrite: true,
-        targetusername: scratchOrg.username
-    })
-    process.chdir('../');
-
-    prepareCredentials({
-        loginUrl:   scratchOrg.loginUrl,
-        username:   scratchOrg.username,
-        password:   scratchOrg.password,
-        baseUrl:    scratchOrg.instanceUrl
-    });
 }
 
 async function prepareCredentials(orgData: any) {
