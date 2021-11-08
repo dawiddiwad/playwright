@@ -47,13 +47,13 @@ async function prepareScratchOrg(): Promise<any> {
 
     if (orgList.result.scratchOrgs.length === 0){
         await spinNewScratchOrg(devHub.username);
-        return await prepareScratchOrg();
+        return prepareScratchOrg();
     } else{
         scratchOrg = orgList.result.scratchOrgs[0];
     }
 
     if (!scratchOrg.password){
-        const scratchOrgUser = await setScratchOrgPassword(devHub.username, scratchOrg.username);
+        scratchOrg.password = (await setScratchOrgPassword(devHub.username, scratchOrg.username)).result.password;
     }
 
     console.log('\tpushing sources...');
@@ -80,11 +80,11 @@ async function prepareCredentials(orgData: any) {
 async function spinNewScratchOrg(devHubUsername: string): Promise<void|any> {
     console.log('\tcreating new scratch org...');
     return await sfdx.org.create({
+        json: true,
         definitionfile:         './salesforce-test-org/config/project-scratch-def.json',
         targetdevhubusername:   devHubUsername,
-        durationdays:           1,
-        setalias:               repo
-    })
+        durationdays:           1
+    }).catch((e)=> {console.log('\tsomething went wrong - trying to continue anyway...')})
 }
 
 async function setScratchOrgPassword(devHubUsername: string, scratchOrgUsername: string): Promise<void|any>{
