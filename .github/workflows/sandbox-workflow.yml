@@ -19,7 +19,7 @@ jobs:
     - name: prepare credentials for sandbox org
       run: npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.SANDBOX_PASS }}
     - name: run tests
-      run: sudo npm test
+      run: npm test
     - uses: actions/upload-artifact@v2
       if: ${{ failure() }}
       with:
