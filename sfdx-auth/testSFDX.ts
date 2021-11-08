@@ -1,11 +1,10 @@
 import { SFDX } from "./tools/sfdx";
 
+const sfdx = new SFDX('sfdx');
+
 (async () => {
     try{
-        console.log(await new SFDX('sfdx').exec({
-            cmd: 'force:org:list', f: ['--json'], 
-            log: true
-        }));
+        await sfdx.exec({cmd: 'force:org:list', f: ['--json'], log: true});
     } catch(e) {
         console.log(e);
     }
