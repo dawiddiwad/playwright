@@ -2,7 +2,7 @@ import {exec} from 'child_process';
 
 interface SdfxParameters {
     cmd: string,
-    params: Array<string>,
+    f: Array<string>,
     log?: boolean
 }
 
@@ -21,9 +21,9 @@ export class SFDX {
         return params;
     }
 
-    public exec({cmd, params, log}: SdfxParameters): Promise<string> {
+    public exec({cmd, f: flags, log}: SdfxParameters): Promise<string> {
         return new Promise<string>((sfdxResponse, sfdxFailure) => {
-            exec(`${this.path} ${cmd} ${this.pass(params)}`, (error, stdout, stderr) => {
+            exec(`${this.path} ${cmd} ${this.pass(flags)}`, (error, stdout, stderr) => {
                 if (error) {
                     sfdxFailure(`sfdx execution failed on:\n${error} ${stderr}`);
                 } else {
