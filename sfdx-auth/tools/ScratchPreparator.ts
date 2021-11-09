@@ -1,7 +1,8 @@
 import { ORG, SandboxPreparator } from "./SandboxPreparator";
 
-export class ScratchOrg extends SandboxPreparator {
+export class ScratchPreparator extends SandboxPreparator {
     public static DEFINITION_FILE_PATH: string = './salesforce-test-org/config/project-scratch-def.json';
+    
     constructor(sfdxEnvPathVariable: string){
         super(sfdxEnvPathVariable);
     }
@@ -16,7 +17,7 @@ export class ScratchOrg extends SandboxPreparator {
                     .fetchCredentialsOf(devhubOrgId, ORG.SANDBOX)
                     .then((credentials) => credentials.username)
                 }`,
-                `--definitionfile ${ScratchOrg.DEFINITION_FILE_PATH}`,
+                `--definitionfile ${ScratchPreparator.DEFINITION_FILE_PATH}`,
                 `--durationdays 1`,
                 '--json',
             ],
