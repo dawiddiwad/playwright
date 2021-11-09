@@ -79,7 +79,7 @@ export class SandboxPreparator {
         }
         else if (type === ORG.SCRATCH && availOrgs.scratchOrgs) {
             availOrgs = this.matchingOrg({
-                list: availOrgs.nonScratchOrgs,
+                list: availOrgs.scratchOrgs,
                 targetId: orgId
             })
         } else {
@@ -99,7 +99,7 @@ export class SandboxPreparator {
         }
     }
 
-    public async credentialsFile(credentials: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
+    public async credentialsFile(data: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
         await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(credentials));
         return credentials;
     }
