@@ -1,11 +1,10 @@
 import { exec } from 'child_process';
 
 interface SdfxParameters {
-    cmd :   string,
-    f?   :   Array<string>,
-    log?:   boolean
+    cmd: string,
+    f?: Array<string>,
+    log?: boolean
 }
-
 export class SFDX {
     private path: string;
 
@@ -21,10 +20,19 @@ export class SFDX {
         return params;
     }
 
-    public exec({ cmd, f: flags, log }: SdfxParameters): Promise<string> {
-        log ? console.log(`executing SFDX command: ${cmd} ${flags ? '***' : null} ...`) : null;
-        return new Promise<string>((sfdxResponse, sfdxFailure) => {
-            exec(`${this.path} ${cmd} ${flags? this.pass(flags) : null}`, (error, stdout, stderr) => {
+    private parseResponse(response: string): string | Object {
+        try {
+            return JSON.parse(response).result;
+        }
+        catch {
+            return response;
+        }
+    }
+
+    public exec({ cmd, f: flags, log }: SdfxParameters): Promise<string | Object> {
+        console.log(`executing SFDX command: ${cmd} ${flags || null}`);
+        return new Promise<string | Object>((sfdxResponse, sfdxFailure) => {
+            exec(`${this.path} ${cmd} ${flags ? this.pass(flags) : null}`, (error, stdout, stderr) => {
                 if (error) {
                     sfdxFailure(`SFDX command failed with exit code: ${error.code} caused by:\n${error}`);
                 } else if (stderr) {
@@ -32,7 +40,7 @@ export class SFDX {
                 }
                 else {
                     log ? console.log(`SFDX command response:\n${stdout}`) : null;
-                    sfdxResponse(stdout);
+                    sfdxResponse(this.parseResponse(stdout));
                 }
             });
         });
