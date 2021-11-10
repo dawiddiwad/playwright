@@ -6,61 +6,85 @@ export enum ORG {
     SANDBOX,
     SCRATCH
 }
-interface SFDX_ACCESS_TOKEN {
-    token: string
-    instanceUrl: string
-}
-
-interface SFDX_AUTH_URL {
+export interface SFDX_AUTH_URL {
     url: string
 }
 
-interface SANDBOX_CREDENTIALS {
+export interface SANDBOX_CREDENTIALS {
     loginUrl: string,
     username: string,
     password: string,
     baseUrl: string
 }
 
+export interface SANDBOX_DATA {
+    username: string;
+    orgId: string;
+    accessToken: string;
+    instanceUrl: string;
+    loginUrl: string;
+    refreshToken: string;
+    clientId: string;
+    clientSecret: string;
+}
+
 export class SandboxPreparator {
-    private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
-    private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
     protected sfdx: SFDX;
 
-    constructor(sfdxEnvPathVariable: string) {
+    public Ready: Promise<SandboxPreparator>;
+    public data: SANDBOX_DATA = { username: '', orgId: '', accessToken: '', instanceUrl: '', 
+        loginUrl: '', refreshToken: '', clientId: '', clientSecret: ''};
+
+    private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
+    private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
+
+    constructor (sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL){
         this.sfdx = new SFDX(sfdxEnvPathVariable);
-    }
-
-    public async authorizeByToken(access: SFDX_ACCESS_TOKEN): Promise<SandboxPreparator> {
-        console.log('Authorizing SFDX via token...');
-        process.env['SFDX_ACCESS_TOKEN'] = access.token;
-        await this.sfdx.exec({
-            cmd: 'auth:accesstoken:store',
-            f: [
-                `--instanceurl ${access.instanceUrl}`,
-                '--noprompt',
-                '--json'
-            ],
-            log: true
+        this.Ready = new Promise<SandboxPreparator>(async (ready) => {
+            const result = await this.authorizeByAuthUrl(authUrl);
+            ready(this);
         });
-        return this;
     }
 
-    public async authorizeByAuthUrl(access: SFDX_AUTH_URL): Promise<SandboxPreparator> {
+
+    protected parseDefaultOrgDataFrom(authResponse: any): SANDBOX_DATA {
+        try {
+            return {
+                username: authResponse.username,
+                orgId: authResponse.orgId,
+                accessToken: authResponse.accessToken,
+                instanceUrl: authResponse.instanceUrl,
+                loginUrl: authResponse.loginUrl,
+                refreshToken: authResponse.refreshToken,
+                clientId: authResponse.clientId,
+                clientSecret: authResponse.clientSecret
+            };
+        } catch (error) {
+            throw new Error(`unable to parse sandbox data due to:\n${error}`);
+        }
+    }
+
+    public async authorizeByAuthUrl(access: SFDX_AUTH_URL): Promise<void> {
         console.log('Authorizing SFDX via auth url...');
-        await writeFile(SandboxPreparator.AUTH_FILE_PATH, `{"sfdxAuthUrl": "${access.url}"}`);
-        await this.sfdx.exec({
-            cmd: 'auth:sfdxurl:store',
-            f: [
-                `--sfdxurlfile ${SandboxPreparator.AUTH_FILE_PATH}`,
-                '--json'
-            ],
-            log: true
-        });
-        return this;
+        try {
+            await writeFile(SandboxPreparator.AUTH_FILE_PATH, `{"sfdxAuthUrl": "${access.url}"}`);
+            const response: any = await this.sfdx.exec({
+                cmd: 'auth:sfdxurl:store',
+                f: [
+                    `--sfdxurlfile ${SandboxPreparator.AUTH_FILE_PATH}`,
+                    '--setdefaultdevhubusername',
+                    '--setdefaultusername',
+                    '--json'
+                ],
+                log: true
+            });
+            this.data = this.parseDefaultOrgDataFrom(response);
+        } catch (e) {
+            throw new Error(`unable to authorize using auth url due to:\n${e}`);
+        }
     }
 
-    public async fetchCredentialsOf(orgId: string, type: ORG ): Promise<SANDBOX_CREDENTIALS> {
+    public async fetchCredentialsOf(orgId: string, type: ORG): Promise<SANDBOX_CREDENTIALS> {
         console.log('fetching org credentials...');
         let availOrgs: any = await this.sfdx.exec({
             cmd: 'force:org:list', f: ['--json']
@@ -89,13 +113,13 @@ export class SandboxPreparator {
         }
     }
 
-    public async pushSourceTo(orgUsername: string) {
+    public async push() {
         console.log('pushing sources...');
         process.chdir('./salesforce-test-org');
         await this.sfdx.exec({
             cmd: 'force:source:push',
             f: [
-                `--targetusername ${orgUsername}`,
+                `--targetusername ${this.data.username}`,
                 `--forceoverwrite`,
                 `--json`
             ],
@@ -108,9 +132,9 @@ export class SandboxPreparator {
         console.log(`cloning ${branch} branch of repository ${repoUrl} ...`);
         return new Promise<string>((repoCloned, failure) => {
             const gitClone = exec(`git clone --branch ${branch} ${repoUrl}`);
-            gitClone.on('exit', (code) => 
+            gitClone.on('exit', (code) =>
                 code !== 1 ? repoCloned('repository cloned sucesfully') : 'was not able to clone repository');
-            gitClone.on('error', (error) => 
+            gitClone.on('error', (error) =>
                 failure(`unable to clone because of:\n${error}`));
         })
     }
