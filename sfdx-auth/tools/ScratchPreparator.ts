@@ -19,7 +19,7 @@ export class ScratchPreparator extends SandboxPreparator {
         });
     }
 
-    private async prepare(): Promise<void> {
+    private async prepare(): Promise<any> {
         console.log("preparing scratch org...");
         try {
             let availOrgs: any = await this.sfdx.exec({
@@ -29,7 +29,7 @@ export class ScratchPreparator extends SandboxPreparator {
                 this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
             } else {
                 await this.create();
-                return this.prepare();
+                await this.prepare();
             }
         } catch (error) {
             console.error(`unable to prepare scratch org due to:\n${error}`);
