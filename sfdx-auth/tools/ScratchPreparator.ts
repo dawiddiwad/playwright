@@ -4,13 +4,13 @@ export class ScratchPreparator extends SandboxPreparator {
     public Ready: Promise<ScratchPreparator>;
     private static DEFINITION_FILE_PATH: string = './salesforce-test-org/config/project-scratch-def.json';
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
-        super(sfdxEnvPathVariable, authUrl, repository);
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string) {
+        super(sfdxEnvPathVariable, authUrl, repository, branch);
 
         this.Ready = new Promise(async (resolve, reject) => {
             try {
                 await this.Ready;
-                await this.cloneRepository("develop", "salesforce-test-org");
+                await this.cloneRepository();
                 await this.prepare();
                 resolve(this);
             } catch (error) {
@@ -33,6 +33,7 @@ export class ScratchPreparator extends SandboxPreparator {
             }
         } catch (error) {
             console.error(`unable to prepare scratch org due to:\n${error}`);
+            process.exit(1);
         }
     }
 

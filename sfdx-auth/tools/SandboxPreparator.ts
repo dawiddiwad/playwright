@@ -30,7 +30,8 @@ export interface SANDBOX_DATA {
 
 export class SandboxPreparator {
     private repoUrl: string = "https://github.com/dawiddiwad";
-    private repository: string | undefined;
+    private repository: string;
+    private branch: string;
 
     protected sfdx: SFDX;
 
@@ -43,9 +44,11 @@ export class SandboxPreparator {
     private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
     private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
+        this.branch = branch;
         this.repository = repository;
+
         this.Ready = new Promise(async (resolve, reject) => {
             await this.authorizeByAuthUrl(authUrl)
                 .catch((e) => reject(`unable to get sandbox ready due to:\n${e}`));
@@ -114,9 +117,6 @@ export class SandboxPreparator {
 
     public async push() {
         console.log('pushing sources...');
-        if (!this.repository){
-            throw new Error("no repository set");
-        }
         process.chdir(`./${this.repository}`);
         await this.sfdx.exec({
             cmd: 'force:source:push',
@@ -130,19 +130,10 @@ export class SandboxPreparator {
         process.chdir('../');
     }
 
-    public async cloneRepository(branch: string, repository?: string): Promise<string> {
-        console.log(`cloning ${branch} branch of repository ${repository} ...`);
-
-        if (!repository && !this.repository){
-            throw new Error("no repository set");
-        } else if (!repository) {
-            repository = this.repository;
-        } else {
-            this.repository = repository;
-        }
-
+    public async cloneRepository(): Promise<string> {
+        console.log(`cloning ${this.branch} branch of repository ${this.repository} ...`);
         return new Promise<string>((repoCloned, failure) => {
-            const gitClone = exec(`git clone --branch ${branch} "${this.repoUrl}/${repository}.git"`);
+            const gitClone = exec(`git clone --branch ${this.branch} "${this.repoUrl}/${this.repository}.git"`);
             gitClone.on('exit', (code) =>
                 code !== 1 ? repoCloned('repository cloned sucesfully') : 'was not able to clone repository');
             gitClone.on('error', (error) =>
