@@ -1,20 +1,21 @@
-import { ORG, SandboxPreparator, SANDBOX_DATA, SFDX_AUTH_URL } from "./SandboxPreparator";
+import { SandboxPreparator, SFDX_AUTH_URL } from "./SandboxPreparator";
 
 export class ScratchPreparator extends SandboxPreparator {
     public Ready: Promise<ScratchPreparator>;
     private static DEFINITION_FILE_PATH: string = './salesforce-test-org/config/project-scratch-def.json';
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL) {
-        super(sfdxEnvPathVariable, authUrl);
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repositoryUrl?: string) {
+        super(sfdxEnvPathVariable, authUrl, repositoryUrl);
 
-        this.Ready = new Promise<ScratchPreparator>(async (ready) => {
-            await super.Ready;
+        this.Ready = new Promise(async (resolve) => {
+            await this.Ready;
             await this.prepare();
-            ready(this);
+            resolve(this);
         });
     }
 
     private async prepare() {
+        console.log("preparing scratch org...");
         let availOrgs: any = await this.sfdx.exec({
             cmd: 'force:org:list', f: ['--json'], log: true
         });

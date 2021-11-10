@@ -5,10 +5,10 @@ const scratchOrg: ScratchPreparator = new ScratchPreparator(sfdxSystemPath, {url
 
 (async () => {
     try{
-        await scratchOrg.Ready.then(async (scratchOrg) => {
-            await scratchOrg.cloneRepository("https://github.com/dawiddiwad/salesforce-test-org.git", "develop");
-            await scratchOrg.generatePassword();
-            await scratchOrg.push();      
+        await scratchOrg.Ready.then(async (org) => {
+            await org.cloneRepository("develop", "salesforce-test-org");
+            await org.generatePassword();
+            await org.push();      
         })   
     } catch(e) {
         console.log(e);

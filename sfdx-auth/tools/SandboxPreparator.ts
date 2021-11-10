@@ -18,36 +18,42 @@ export interface SANDBOX_CREDENTIALS {
 }
 
 export interface SANDBOX_DATA {
-    username: string;
-    orgId: string;
-    accessToken: string;
-    instanceUrl: string;
-    loginUrl: string;
-    refreshToken: string;
-    clientId: string;
-    clientSecret: string;
+    username: string,
+    orgId: string,
+    accessToken: string,
+    instanceUrl: string,
+    loginUrl: string,
+    refreshToken: string,
+    clientId: string,
+    clientSecret: string
 }
 
 export class SandboxPreparator {
+    private repoUrl: string = "https://github.com/dawiddiwad";
+    private repository: string | undefined;
+
     protected sfdx: SFDX;
 
     public Ready: Promise<SandboxPreparator>;
-    public data: SANDBOX_DATA = { username: '', orgId: '', accessToken: '', instanceUrl: '', 
-        loginUrl: '', refreshToken: '', clientId: '', clientSecret: ''};
+    public data: SANDBOX_DATA = {
+        username: '', orgId: '', accessToken: '', instanceUrl: '',
+        loginUrl: '', refreshToken: '', clientId: '', clientSecret: ''
+    };
 
     private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
     private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
 
-    constructor (sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL){
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repositoryUrl?: string) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
-        this.Ready = new Promise<SandboxPreparator>(async (ready) => {
-            const result = await this.authorizeByAuthUrl(authUrl);
-            ready(this);
+        this.repository = repositoryUrl;
+        this.Ready = new Promise(async (resolve) => {
+            await this.authorizeByAuthUrl(authUrl);
+            resolve(this);
         });
     }
 
-
     protected parseDefaultOrgDataFrom(authResponse: any): SANDBOX_DATA {
+        console.log("preparing org data...");
         try {
             return {
                 username: authResponse.username,
@@ -115,7 +121,10 @@ export class SandboxPreparator {
 
     public async push() {
         console.log('pushing sources...');
-        process.chdir('./salesforce-test-org');
+        if (!this.repository){
+            throw new Error("no repository set");
+        }
+        process.chdir(`./${this.repository}`);
         await this.sfdx.exec({
             cmd: 'force:source:push',
             f: [
@@ -124,22 +133,32 @@ export class SandboxPreparator {
                 `--json`
             ],
             log: true
-        })
+        });
         process.chdir('../');
     }
 
-    public async cloneRepository(repoUrl: string, branch: string): Promise<string> {
-        console.log(`cloning ${branch} branch of repository ${repoUrl} ...`);
+    public async cloneRepository(branch: string, repository?: string): Promise<string> {
+        console.log(`cloning ${branch} branch of repository ${repository} ...`);
+
+        if (!repository && !this.repository){
+            throw new Error("no repository set");
+        } else if (!repository) {
+            repository = this.repository;
+        } else {
+            this.repository = repository;
+        }
+
         return new Promise<string>((repoCloned, failure) => {
-            const gitClone = exec(`git clone --branch ${branch} ${repoUrl}`);
+            const gitClone = exec(`git clone --branch ${branch} "${this.repoUrl}/${repository}.git"`);
             gitClone.on('exit', (code) =>
                 code !== 1 ? repoCloned('repository cloned sucesfully') : 'was not able to clone repository');
             gitClone.on('error', (error) =>
                 failure(`unable to clone because of:\n${error}`));
-        })
+        });
     }
 
     public async credentialsFile(data: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
+        console.log("writing crednetials file...");
         await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(data));
         return data;
     }
