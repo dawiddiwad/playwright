@@ -43,9 +43,9 @@ export class SandboxPreparator {
     private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
     private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repositoryUrl?: string) {
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
-        this.repository = repositoryUrl;
+        this.repository = repository;
         this.Ready = new Promise(async (resolve) => {
             await this.authorizeByAuthUrl(authUrl);
             resolve(this);
@@ -90,33 +90,25 @@ export class SandboxPreparator {
         }
     }
 
-    public async fetchCredentialsOf(orgId: string, type: ORG): Promise<SANDBOX_CREDENTIALS> {
-        console.log('fetching org credentials...');
-        let availOrgs: any = await this.sfdx.exec({
-            cmd: 'force:org:list', f: ['--json']
+    public async fetchCredentials(username?: string): Promise<SANDBOX_CREDENTIALS> {
+        username = username ? username : this.data.username; 
+        console.log(`fetching credentials for org ${username}...`);
+
+        let orgData: any = await this.sfdx.exec({
+            cmd: 'force:org:display',
+            f: [
+                `--targetusername ${username}`,
+                '--json'
+            ],
+            log: true
         });
-        const allOrgs = availOrgs;
 
-        const matchById = (org: any) => org.orgId === orgId;
-        if (type === ORG.SANDBOX && availOrgs.nonScratchOrgs) {
-            availOrgs = availOrgs.nonScratchOrgs.filter(matchById);
-        } else if (type === ORG.SCRATCH && availOrgs.scratchOrgs) {
-            availOrgs = availOrgs.scratchOrgs.filter(matchById);
-        } else {
-            throw new Error(`no orgs found in:\n${JSON.stringify(availOrgs)}`);
-        }
-
-        if (availOrgs.length !== 0) {
-            const credentials: SANDBOX_CREDENTIALS = {
-                loginUrl: availOrgs[0].loginUrl,
-                username: availOrgs[0].username,
-                password: availOrgs[0].password,
-                baseUrl: availOrgs[0].baseUrl,
-            };
-            return credentials;
-        } else {
-            throw new Error(`no matching orgs found in:\n${JSON.stringify(allOrgs)}`);
-        }
+        return {
+            loginUrl: this.data.loginUrl,
+            username: username,
+            password: orgData.password,
+            baseUrl: orgData.instanceUrl,
+        };
     }
 
     public async push() {

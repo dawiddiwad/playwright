@@ -4,8 +4,8 @@ export class ScratchPreparator extends SandboxPreparator {
     public Ready: Promise<ScratchPreparator>;
     private static DEFINITION_FILE_PATH: string = './salesforce-test-org/config/project-scratch-def.json';
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repositoryUrl?: string) {
-        super(sfdxEnvPathVariable, authUrl, repositoryUrl);
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
+        super(sfdxEnvPathVariable, authUrl, repository);
 
         this.Ready = new Promise(async (resolve) => {
             await this.Ready;
