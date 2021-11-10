@@ -22,6 +22,7 @@ export class ScratchPreparator extends SandboxPreparator {
         if (availOrgs.scratchOrgs.length > 0){
             this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
         } else {
+            await this.cloneRepository('develop');
             await this.create();
         }
     }
