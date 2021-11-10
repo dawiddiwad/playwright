@@ -19,7 +19,7 @@ export class ScratchPreparator extends SandboxPreparator {
         });
     }
 
-    private async prepare(): Promise<any> {
+    private async prepare(): Promise<void> {
         console.log("preparing scratch org...");
         try {
             let availOrgs: any = await this.sfdx.exec({
