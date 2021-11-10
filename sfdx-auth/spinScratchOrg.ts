@@ -3,6 +3,9 @@ import { ScratchPreparator } from './tools/ScratchPreparator';
 const sfdx = Client.createUsingPath('sfdx');
 
 (async () => {
+    process.on('warning', (warning) => {
+        console.log(warning.stack);
+    });
     console.log('preparing scratch org for testing:');
     const scratchOrg = new ScratchPreparator('sfdx', {url: process.argv[2]}, 'salesforce-test-org', 'develop');
     try {
