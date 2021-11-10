@@ -46,8 +46,9 @@ export class SandboxPreparator {
     constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
         this.repository = repository;
-        this.Ready = new Promise(async (resolve) => {
-            await this.authorizeByAuthUrl(authUrl);
+        this.Ready = new Promise(async (resolve, reject) => {
+            await this.authorizeByAuthUrl(authUrl)
+                .catch((e) => reject(`unable to get sandbox ready due to:\n${e}`));
             resolve(this);
         });
     }

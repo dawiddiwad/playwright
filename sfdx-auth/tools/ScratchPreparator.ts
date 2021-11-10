@@ -7,9 +7,13 @@ export class ScratchPreparator extends SandboxPreparator {
     constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
         super(sfdxEnvPathVariable, authUrl, repository);
 
-        this.Ready = new Promise(async (resolve) => {
-            await this.Ready;
-            await this.prepare();
+        this.Ready = new Promise(async (resolve, reject) => {
+            try {
+                await this.Ready;
+                await this.prepare();
+            } catch (e) {
+                reject(`unable to get scratch org ready due to:\n${e}`)
+            }
             resolve(this);
         });
     }
@@ -22,14 +26,19 @@ export class ScratchPreparator extends SandboxPreparator {
         if (availOrgs.scratchOrgs.length > 0){
             this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
         } else {
-            await this.cloneRepository("develop", "salesforce-test-org");
-            await this.create();
+            try {
+                await this.cloneRepository("develop", "salesforce-test-org");
+                await this.create();
+                await this.prepare();
+            } catch (e) {
+                console.error(`unable to prepare scratch org due to:\n${e}`);
+            }
         }
     }
 
-    public async create() {
+    private async create() {
         console.log(`Creating new scratch org under default dev hub ...`);
-        const response = await this.sfdx.exec({
+        await this.sfdx.exec({
             cmd: 'force:org:create',
             f: [
                 `--definitionfile ${ScratchPreparator.DEFINITION_FILE_PATH}`,
@@ -38,7 +47,6 @@ export class ScratchPreparator extends SandboxPreparator {
             ],
             log: true
         });
-        this.data = this.parseDefaultOrgDataFrom(response);
     }
 
     public async generatePassword() {
