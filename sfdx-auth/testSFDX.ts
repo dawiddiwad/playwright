@@ -6,7 +6,6 @@ const scratchOrg: ScratchPreparator = new ScratchPreparator(sfdxSystemPath, {url
 (async () => {
     try{
         await scratchOrg.Ready.then(async (org) => {
-            await org.cloneRepository("develop", "salesforce-test-org");
             await org.generatePassword();
             await org.push();      
         })   
