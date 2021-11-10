@@ -1,4 +1,5 @@
 import { SFDX } from "./sfdx";
+import { exec } from "child_process";
 import { writeFile } from "fs/promises";
 
 export enum ORG {
@@ -59,11 +60,6 @@ export class SandboxPreparator {
         return this;
     }
 
-    public matchingOrg({ list, targetId }: { list: []; targetId: string; }): never[] {
-        const matcher = (org: any) => org.orgId === targetId;
-        return list.filter(matcher);
-    }
-
     public async fetchCredentialsOf(orgId: string, type: ORG ): Promise<SANDBOX_CREDENTIALS> {
         console.log('fetching org credentials...');
         let availOrgs: any = await this.sfdx.exec({
@@ -71,17 +67,11 @@ export class SandboxPreparator {
         });
         const allOrgs = availOrgs;
 
+        const matchById = (org: any) => org.orgId === orgId;
         if (type === ORG.SANDBOX && availOrgs.nonScratchOrgs) {
-            availOrgs = this.matchingOrg({
-                list: availOrgs.nonScratchOrgs,
-                targetId: orgId
-            })
-        }
-        else if (type === ORG.SCRATCH && availOrgs.scratchOrgs) {
-            availOrgs = this.matchingOrg({
-                list: availOrgs.nonScratchOrgs,
-                targetId: orgId
-            })
+            availOrgs = availOrgs.nonScratchOrgs.filter(matchById);
+        } else if (type === ORG.SCRATCH && availOrgs.scratchOrgs) {
+            availOrgs = availOrgs.scratchOrgs.filter(matchById);
         } else {
             throw new Error(`no orgs found in:\n${JSON.stringify(availOrgs)}`);
         }
@@ -99,8 +89,34 @@ export class SandboxPreparator {
         }
     }
 
-    public async credentialsFile(credentials: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
-        await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(credentials));
-        return credentials;
+    public async pushSourceTo(orgUsername: string) {
+        console.log('pushing sources...');
+        process.chdir('./salesforce-test-org');
+        await this.sfdx.exec({
+            cmd: 'force:source:push',
+            f: [
+                `--targetusername ${orgUsername}`,
+                `--forceoverwrite`,
+                `--json`
+            ],
+            log: true
+        })
+        process.chdir('../');
+    }
+
+    public async cloneRepository(repoUrl: string, branch: string): Promise<string> {
+        console.log(`cloning ${branch} branch of repository ${repoUrl} ...`);
+        return new Promise<string>((repoCloned, failure) => {
+            const gitClone = exec(`git clone --branch ${branch} ${repoUrl}`);
+            gitClone.on('exit', (code) => 
+                code !== 1 ? repoCloned('repository cloned sucesfully') : 'was not able to clone repository');
+            gitClone.on('error', (error) => 
+                failure(`unable to clone because of:\n${error}`));
+        })
+    }
+
+    public async credentialsFile(data: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
+        await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(data));
+        return data;
     }
 }

@@ -7,8 +7,8 @@ export class ScratchPreparator extends SandboxPreparator {
         super(sfdxEnvPathVariable);
     }
 
-    public async create(devhubOrgId: string){
-        console.log('Creating new scratch org...');
+    public async createUnder(devhubOrgId: string){
+        console.log(`Creating new scratch org under dev hub ${devhubOrgId} ...`);
         await this.sfdx.exec({
             cmd: 'force:org:create',
             f: [
@@ -22,6 +22,27 @@ export class ScratchPreparator extends SandboxPreparator {
                 '--json',
             ],
             log: true
-        })
+        });
+    }
+
+    public async generatePassword(devhubOrgId: string, scratchOrgId: string){
+        console.log(`Generating password for scratch org ${scratchOrgId} ...`);
+        await this.sfdx.exec({
+            cmd: 'force:user:password:generate',
+            f: [
+                `--targetdevhubusername ${
+                    await this
+                    .fetchCredentialsOf(devhubOrgId, ORG.SANDBOX)
+                    .then((credentials) => credentials.username)
+                }`,
+                `--targetusername ${
+                    await this
+                    .fetchCredentialsOf(scratchOrgId, ORG.SCRATCH)
+                    .then((credentials) => credentials.username)
+                }`,
+                `--json`
+            ],
+            log: true
+        });
     }
 }
