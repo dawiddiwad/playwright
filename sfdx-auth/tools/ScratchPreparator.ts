@@ -10,9 +10,10 @@ export class ScratchPreparator extends SandboxPreparator {
         this.Ready = new Promise(async (resolve, reject) => {
             try {
                 await this.Ready;
+                await this.cloneRepository("develop", "salesforce-test-org");
                 await this.prepare();
-            } catch (e) {
-                reject(`unable to get scratch org ready due to:\n${e}`)
+            } catch (error) {
+                reject(`unable to get scratch org ready due to:\n${error}`);
             }
             resolve(this);
         });
@@ -20,19 +21,18 @@ export class ScratchPreparator extends SandboxPreparator {
 
     private async prepare() {
         console.log("preparing scratch org...");
-        let availOrgs: any = await this.sfdx.exec({
-            cmd: 'force:org:list', f: ['--json'], log: true
-        });
-        if (availOrgs.scratchOrgs.length > 0){
-            this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
-        } else {
-            try {
-                await this.cloneRepository("develop", "salesforce-test-org");
+        try {
+            let availOrgs: any = await this.sfdx.exec({
+                cmd: 'force:org:list', f: ['--json'], log: true
+            });
+            if (availOrgs.scratchOrgs.length > 0) {
+                this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
+            } else {
                 await this.create();
                 await this.prepare();
-            } catch (e) {
-                console.error(`unable to prepare scratch org due to:\n${e}`);
             }
+        } catch (error) {
+            console.error(`unable to prepare scratch org due to:\n${error}`);
         }
     }
 
