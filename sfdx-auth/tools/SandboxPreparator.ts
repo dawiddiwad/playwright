@@ -53,18 +53,18 @@ export class SandboxPreparator {
         });
     }
 
-    protected parseDefaultOrgDataFrom(authResponse: any): SANDBOX_DATA {
+    protected parseDefaultOrgDataFrom(data: any): SANDBOX_DATA {
         console.log("preparing org data...");
         try {
             return {
-                username: authResponse.username,
-                orgId: authResponse.orgId,
-                accessToken: authResponse.accessToken,
-                instanceUrl: authResponse.instanceUrl,
-                loginUrl: authResponse.loginUrl,
-                refreshToken: authResponse.refreshToken,
-                clientId: authResponse.clientId,
-                clientSecret: authResponse.clientSecret
+                username: data.username,
+                orgId: data.orgId,
+                accessToken: data.accessToken,
+                instanceUrl: data.instanceUrl,
+                loginUrl: data.loginUrl,
+                refreshToken: data.refreshToken,
+                clientId: data.clientId,
+                clientSecret: data.clientSecret
             };
         } catch (error) {
             throw new Error(`unable to parse sandbox data due to:\n${error}`);

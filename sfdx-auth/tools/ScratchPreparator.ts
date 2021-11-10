@@ -12,10 +12,10 @@ export class ScratchPreparator extends SandboxPreparator {
                 await this.Ready;
                 await this.cloneRepository("develop", "salesforce-test-org");
                 await this.prepare();
+                resolve(this);
             } catch (error) {
                 reject(`unable to get scratch org ready due to:\n${error}`);
             }
-            resolve(this);
         });
     }
 
@@ -29,7 +29,7 @@ export class ScratchPreparator extends SandboxPreparator {
                 this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
             } else {
                 await this.create();
-                await this.prepare();
+                return this.prepare();
             }
         } catch (error) {
             console.error(`unable to prepare scratch org due to:\n${error}`);
