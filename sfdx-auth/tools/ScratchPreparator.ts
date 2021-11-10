@@ -19,7 +19,7 @@ export class ScratchPreparator extends SandboxPreparator {
         });
     }
 
-    private async prepare() {
+    private async prepare(): Promise<void> {
         console.log("preparing scratch org...");
         try {
             let availOrgs: any = await this.sfdx.exec({
@@ -36,7 +36,7 @@ export class ScratchPreparator extends SandboxPreparator {
         }
     }
 
-    private async create() {
+    private async create(): Promise<void> {
         console.log(`Creating new scratch org under default dev hub ...`);
         await this.sfdx.exec({
             cmd: 'force:org:create',
@@ -49,7 +49,7 @@ export class ScratchPreparator extends SandboxPreparator {
         });
     }
 
-    public async generatePassword() {
+    public async generatePassword(): Promise<void> {
         console.log(`Generating password for scratch org ${this.data.orgId} ...`);
         await this.sfdx.exec({
             cmd: 'force:user:password:generate',
