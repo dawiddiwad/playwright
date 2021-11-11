@@ -24,7 +24,8 @@ jobs:
     - name: prepare scratch org
       run: |
         export PATH=~/sfdx/bin:$PATH
-        npx ts-node sfdx-auth/spinScratchOrg.ts ${{ secrets.DEVHUB_TOKEN }}
+        node -v
+ # npx ts-node sfdx-auth/spinScratchOrg.ts ${{ secrets.DEVHUB_TOKEN }}
     - name: Run tests
       run: npm test
     - uses: actions/upload-artifact@v2
