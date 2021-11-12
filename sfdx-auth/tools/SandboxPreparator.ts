@@ -85,8 +85,7 @@ export class SandboxPreparator {
                     '--setdefaultdevhubusername',
                     '--setdefaultusername',
                     '--json'
-                ],
-                log: true
+                ]
             });
             this.data = this.parseDefaultOrgDataFrom(response);
         } catch (e) {
@@ -104,8 +103,7 @@ export class SandboxPreparator {
                 `--targetusername ${username}`,
                 '--urlonly',
                 '--json'
-            ],
-            log: true
+            ]
         });
 
         return {

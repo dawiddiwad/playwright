@@ -23,7 +23,7 @@ export class ScratchPreparator extends SandboxPreparator {
         console.log("preparing scratch org...");
         try {
             let availOrgs: any = await this.sfdx.exec({
-                cmd: 'force:org:list', f: ['--json'], log: true
+                cmd: 'force:org:list', f: ['--json']
             });
             if (availOrgs.scratchOrgs.length > 0) {
                 this.data = this.parseDefaultOrgDataFrom(availOrgs.scratchOrgs[0]);
@@ -57,8 +57,7 @@ export class ScratchPreparator extends SandboxPreparator {
             f: [
                 `--targetusername ${this.data.username}`,
                 `--json`
-            ],
-            log: true
+            ]
         });
     }
 }
