@@ -11,9 +11,9 @@ export interface SFDX_AUTH_URL {
 }
 
 export interface SANDBOX_CREDENTIALS {
-    loginUrl: string,
+    orgId: string,
+    url: string,
     username: string,
-    password: string,
     baseUrl: string
 }
 
@@ -96,22 +96,23 @@ export class SandboxPreparator {
 
     public async fetchCredentials(username?: string): Promise<SANDBOX_CREDENTIALS> {
         username = username ? username : this.data.username; 
-        console.log(`fetching credentials for org ${username}...`);
+        console.log(`fetching credentials for ${username}...`);
 
-        let orgData: any = await this.sfdx.exec({
-            cmd: 'force:org:display',
+        let credentials: any = await this.sfdx.exec({
+            cmd: 'force:org:open',
             f: [
                 `--targetusername ${username}`,
+                '--urlonly',
                 '--json'
             ],
             log: true
         });
 
         return {
-            loginUrl: this.data.loginUrl,
-            username: username,
-            password: orgData.password,
-            baseUrl: orgData.instanceUrl,
+            orgId: credentials.orgId,
+            url: credentials.url,
+            username: credentials.username,
+            baseUrl: this.data.instanceUrl
         };
     }
 

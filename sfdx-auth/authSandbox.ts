@@ -1,14 +1,12 @@
-import { SandboxPreparator, SANDBOX_CREDENTIALS } from "./tools/SandboxPreparator";
+import { SandboxPreparator } from "./tools/SandboxPreparator";
 
 const token = process.argv[2];
-const password = process.argv[3];
 const sandbox = new SandboxPreparator('sfdx', { url: token }, 'salesforce-test-org', 'develop');
 (async () => {
     try {
+        console.log('preparing sandbox for testing:');
         await sandbox.Ready.then(async (org) => {
-            let data: SANDBOX_CREDENTIALS = await org.fetchCredentials();
-            data.password = password;
-            await org.credentialsFile(data);
+            await org.credentialsFile(await org.fetchCredentials());
         })
     } catch (error) {
         console.error(`unable to prepare sandbox due to:\n${error}`);

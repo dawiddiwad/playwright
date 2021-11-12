@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 import { Modal } from "./Modal";
 import { readFile } from "fs";
+import { SANDBOX_CREDENTIALS } from "../../sfdx-auth/tools/SandboxPreparator";
 
 enum LoginInteruption {
     ConfirmIdentity = "LoginInterstitial",
@@ -8,17 +9,14 @@ enum LoginInteruption {
     ClassicContext = "salesforce.com"
 }
 export class SFDC {
-    private static  loginUrl:   string = '';
-    private static  username:   string = '';
-    private static  password:   string = '';
-    public  static  baseUrl:    string = '';
+    private static credentials: SANDBOX_CREDENTIALS;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
     }
 
     private static getBaseUrlForLEX(): string {
-        return this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
+        return this.credentials.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
     }
 
     private static async checkInteruptions(page: Page): Promise<void> {
@@ -39,19 +37,21 @@ export class SFDC {
                 throw new Error(`unable to read credentials.json due to:\n${error.message}`); 
             }
             data = JSON.parse(data.toString());
-            this.loginUrl   = String(data.loginUrl);
-            this.username   = String(data.username);
-            this.password   = String(data.password);
-            this.baseUrl    = String(data.baseUrl);
+            this.credentials = {
+                orgId: String(data.orgId),
+                url: String(data.url),
+                username: String(data.username),
+                baseUrl: String(data.baseUrl)
+            }
         })
     }
 
     public static async login(page: Page): Promise<void> {
-        await page.goto(`${this.loginUrl}?un=${this.username}&pw=${this.password}`, {waitUntil: 'networkidle'});
+        await page.goto(this.credentials.url, {waitUntil: 'networkidle'});
         await this.checkInteruptions(page);
     }
 
     public static async logout(page: Page): Promise<void> {
-        await page.goto(`${this.baseUrl}/secur/logout.jsp`, {waitUntil: 'networkidle'});
+        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`, {waitUntil: 'networkidle'});
     }
 }
