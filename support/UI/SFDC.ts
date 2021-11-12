@@ -27,7 +27,7 @@ export class SFDC {
             await page.click(Modal.skipPhoneRegistrationLink);
         }
         if (this.isOn(page, LoginInteruption.ClassicContext)) {
-            await page.goto(this.switchToLEX());
+            await page.goto(this.switchToLEX(), {waitUntil: 'networkidle', timeout: 20000});
         }
     }
 
@@ -47,11 +47,11 @@ export class SFDC {
     }
 
     public static async login(page: Page): Promise<void> {
-        await page.goto(this.credentials.url, {waitUntil: 'networkidle'});
+        await page.goto(this.credentials.url, {waitUntil: 'networkidle', timeout: 20000});
         await this.checkInteruptions(page);
     }
 
     public static async logout(page: Page): Promise<void> {
-        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`,{waitUntil: 'networkidle', timeout: 20000});
+        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`, {waitUntil: 'networkidle'});
     }
 }
