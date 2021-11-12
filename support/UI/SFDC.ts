@@ -6,7 +6,7 @@ import { SANDBOX_CREDENTIALS } from "../../sfdx-auth/tools/SandboxPreparator";
 enum LoginInteruption {
     ConfirmIdentity = "LoginInterstitial",
     RegisterPhone = "AddPhoneNumber",
-    ClassicContext = "salesforce.com"
+    ClassicContext = "my.salesforce.com"
 }
 export class SFDC {
     private static credentials: SANDBOX_CREDENTIALS;
@@ -15,8 +15,8 @@ export class SFDC {
         return page.url().includes(interuption);
     }
 
-    private static getBaseUrlForLEX(): string {
-        return this.credentials.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
+    private static switchToLEX(): string {
+        return `${this.credentials.baseUrl}/lightning/page/home`;
     }
 
     private static async checkInteruptions(page: Page): Promise<void> {
@@ -27,7 +27,7 @@ export class SFDC {
             await page.click(Modal.skipPhoneRegistrationLink);
         }
         if (this.isOn(page, LoginInteruption.ClassicContext)) {
-            await page.goto(this.getBaseUrlForLEX(), {waitUntil: 'networkidle'});
+            await page.goto(this.switchToLEX());
         }
     }
 
@@ -52,6 +52,6 @@ export class SFDC {
     }
 
     public static async logout(page: Page): Promise<void> {
-        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`, {waitUntil: 'networkidle'});
+        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`,{waitUntil: 'networkidle', timeout: 20000});
     }
 }
