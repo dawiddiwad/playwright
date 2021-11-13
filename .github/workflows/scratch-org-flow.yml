@@ -24,6 +24,7 @@ jobs:
     - name: prepare scratch org
       run: |
         export PATH=~/sfdx/bin:$PATH
+        export NODE_NO_WARNINGS=1
         npx ts-node sfdx-auth/spinScratchOrg.ts ${{ secrets.DEVHUB_TOKEN }}
     - name: Run tests
       run: npm test
