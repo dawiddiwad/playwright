@@ -2,11 +2,11 @@
 
 const { test, expect } = require('@playwright/test');
 const { Details } = require('../support/UI/Details');
-const { SFDC } = require('../support/UI/SFDC');
+const { SFDCui } = require('../support/UI/SFUI');
 const { NavigationBar } = require('../support/UI/NavigationBar');
 
 test.beforeAll(async () => {
-    await SFDC.init();
+    await SFDCui.init();
 })
 
 test.describe.parallel('SFDC-poc', () => {
@@ -14,7 +14,7 @@ test.describe.parallel('SFDC-poc', () => {
         test.slow();
         const salesConsole = "Sales Console";
         const overdueTasks = "Overdue Tasks";
-        await SFDC.login(page);        
+        await SFDCui.login(page);        
         await page.click(NavigationBar.appLauncherIcon, {delay:2000});
         await page.fill(NavigationBar.appLauncherSearch, salesConsole);
         await page.click(NavigationBar.selectApplication(salesConsole));
@@ -47,13 +47,13 @@ test.describe.parallel('SFDC-poc', () => {
 
         const deleteConfirmToast = page.locator("//div[contains(@class, 'slds-notify--toast')]");
         await expect(deleteConfirmToast.first()).toContainText(`Task "${taskSubject}" was deleted.`);
-        await SFDC.logout(page);
+        await SFDCui.logout(page);
     });
 
     test('Interact with LWC', async ({ page }) => {
         test.slow();
         const appContext = "Sales";
-        await SFDC.login(page);
+        await SFDCui.login(page);
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
         await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
@@ -64,14 +64,14 @@ test.describe.parallel('SFDC-poc', () => {
         const lwcInput = "a cypress jeszcze lepszy";
         await page.fill("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput);
         await expect(page.locator(lwcOutput)).toContainText(`LWC zajebiste jest, ${lwcInput}!`);
-        await SFDC.logout(page);
+        await SFDCui.logout(page);
     });
 
     test('Interact with iframe and shadowDom', async ({ page }) => {
         test.slow();
         const appContext = "Sales";
 
-        await SFDC.login(page);
+        await SFDCui.login(page);
         await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", { delay: 2000 });
         await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
@@ -84,7 +84,7 @@ test.describe.parallel('SFDC-poc', () => {
         await shadowDomInputLocator.first().scrollIntoViewIfNeeded();
         await shadowDomInputLocator.first().type(lwcInput);
         await expect(frame.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
-        await SFDC.logout(page);
+        await SFDCui.logout(page);
     });
 })
 

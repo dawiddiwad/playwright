@@ -7,7 +7,7 @@ enum LoginInteruption {
     RegisterPhone = "AddPhoneNumber",
     ClassicContext = "salesforce.com"
 }
-export class SFDC {
+export class SFDCui {
     private static  loginUrl:   string = '';
     private static  username:   string = '';
     private static  password:   string = '';
