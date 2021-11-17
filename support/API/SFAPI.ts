@@ -17,23 +17,23 @@ export class SFDCapi {
                 this.userInfo = await this.conn.login(credentials.username, credentials.password);
                 connected(this);
             } catch(error) {
-                console.error(`unable to initialize SFDC API due to:\n${error}`);
+                console.error(`unable to initialize SFDC API due to:\n${(error as Error).stack}`);
                 failure(error);
             }
         })
     }
 
-    private checkForErrors(results: RecordResult[]): SuccessResult[] {
+    private checkForErrors(data: RecordResult[]): SuccessResult[] {
         let errors: string[] = [];
-        results.forEach((result) => {
+        data.forEach((result) => {
             if (!result.success){
                 (result as ErrorResult).errors
                     .forEach((error) => errors.push(error));
             }
         })
         if (errors.length > 0) {
-            throw new Error(`some issues on creating ${JSON.stringify(errors)}`);
-        } else return results as SuccessResult[];
+            throw new Error(`jsforce failed on: ${JSON.stringify(errors)}`);
+        } else return data as SuccessResult[];
     }
 
     public async create(sobject: string, data: Object | Array<Object>): Promise<SuccessResult | SuccessResult[]> {
@@ -51,14 +51,14 @@ export class SFDCapi {
         }
     }
 
-    public async delete(sobject: string, id: SalesforceId | string[]): Promise<RecordResult | RecordResult[]>{
+    public async delete(sobject: string, id: SalesforceId | SalesforceId[]): Promise<RecordResult | RecordResult[]>{
         try {
             console.log(`deleting ${sobject} records ${id} ...`);
             const result = await this.conn.delete(sobject, id);
             console.log(`deleted ${sobject} :\n${JSON.stringify(result)}`);
             return result;
         } catch (error) {
-            console.error(`unable to delete ${sobject} due to:\n${error}`);
+            console.error(`unable to delete ${sobject} due to:\n${(error as Error).stack}`);
             process.exit(1);
         }
     }
@@ -67,9 +67,10 @@ export class SFDCapi {
         try {
             console.log(`reading ${sobject} data of ${id} ...`);
             const result = await this.conn.retrieve(sobject, id);
-            console.log(result);
+            return result;
         } catch (error) {
-            
+            console.error(`unable to read ${sobject} record ${id} due to:\n${(error as Error).stack}`);
+            process.exit(1);
         }
     }
 
@@ -77,7 +78,7 @@ export class SFDCapi {
         try {
             return await this.conn.query(soql);
         } catch (error) {
-            console.error(`unable to execute soql:\n${soql}\ndue to:\n${error}`);
+            console.error(`unable to execute soql:\n${soql}\ndue to:\n${(error as Error).stack}`);
             process.exit(1);
         }
     }
@@ -86,8 +87,8 @@ export class SFDCapi {
 (async ()=> {
     new SFDCapi({username: 'dawid89dobrowolski@brave-wolf-qm0gmg.com', password: '%Zaamdkjop9rn'})
         .Ready.then(async (api) => {
-            const acc = await api.create('Account', [{name: 'api2'}, {yolo: 'api2'}]);
-            console.log(acc);
+            const accounts = await api.create('Account', [{name: 'api2'}, {name: 'api2'}]) as SuccessResult[];
+            accounts.forEach(async (acc) => await api.delete('Account', acc.id));
             console.log((await api.query('select id from Account')).totalSize);
-        })
+        });
 })()
