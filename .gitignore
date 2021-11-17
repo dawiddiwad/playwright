@@ -3,3 +3,4 @@ test-results
 playwright-report
 *credentials.json
 *auth.json
+*authFile.json
