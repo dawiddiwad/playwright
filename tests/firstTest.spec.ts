@@ -1,11 +1,19 @@
 //@ts-check
 
+import { Record, SuccessResult } from "jsforce";
+import { SFDCapi } from "../support/api/SFAPI";
+
 const { test, expect } = require('@playwright/test');
 const { Details } = require('../support/UI/Details');
 const { SFDCui } = require('../support/UI/SFUI');
 const { NavigationBar } = require('../support/UI/NavigationBar');
+const { readFile } = require('fs/promises');
+
+let api: SFDCapi;
 
 test.beforeAll(async () => {
+    const credentials = JSON.parse((await readFile('sfdx-auth/credentials.json')).toString());
+    api = await new SFDCapi({username: credentials.username, password: credentials.password}).Ready;
     await SFDCui.init();
 })
 
@@ -86,5 +94,32 @@ test.describe.parallel('SFDC-poc', () => {
         await expect(frame.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
         await SFDCui.logout(page);
     });
+    test('Create -> Delete Account flow via API', async() => {
+        const insertData = {
+            Name: 'cucumber table',
+            BillingCity: 'Piździszew dolny',
+            Industry: 'Banking'
+        }
+        const account = await api.create('Account', insertData) as SuccessResult;
+        const createdData = await api.read('Account', account.id);
+        for (const field in insertData){
+            expect(createdData[field]).toEqual(insertData[field]);
+        }
+        await api.delete('Account', account.id);
+    })
+    test('Create -> Delete Lead flow via API', async() => {
+        const insertData = {
+            Company: 'cucumber table',
+            FirstName: 'Mariusz',
+            LastName: 'Poczciwy',
+            Status: 'Open - Not Contacted'
+        }
+        const lead = await api.create('Lead', insertData) as SuccessResult;
+        const createdData = await api.read('Lead', lead.id);
+        for (const field in insertData){
+            expect(createdData[field]).toEqual(insertData[field]);
+        }
+        await api.delete('Lead', lead.id);
+    })
 })
 

@@ -54,16 +54,19 @@ export class SFDCapi {
     public async delete(sobject: string, id: SalesforceId | SalesforceId[]): Promise<RecordResult | RecordResult[]>{
         try {
             console.log(`deleting ${sobject} records ${id} ...`);
-            const result = await this.conn.delete(sobject, id);
-            console.log(`deleted ${sobject} :\n${JSON.stringify(result)}`);
-            return result;
+            const results = await this.conn.delete(sobject, id);
+            if (results instanceof Array){
+                return this.checkForErrors(results);
+            } else {
+                return results as SuccessResult;
+            }
         } catch (error) {
             console.error(`unable to delete ${sobject} due to:\n${(error as Error).stack}`);
             process.exit(1);
         }
     }
 
-    public async read(sobject: string, id: SalesforceId | string[]): Promise<Record | Record[]>{
+    public async read(sobject: string, id: SalesforceId | SalesforceId[]): Promise<Record | Record[]>{
         try {
             console.log(`reading ${sobject} data of ${id} ...`);
             const result = await this.conn.retrieve(sobject, id);
@@ -83,12 +86,3 @@ export class SFDCapi {
         }
     }
 }
-
-(async ()=> {
-    new SFDCapi({username: 'dawid89dobrowolski@brave-wolf-qm0gmg.com', password: '%Zaamdkjop9rn'})
-        .Ready.then(async (api) => {
-            const accounts = await api.create('Account', [{name: 'api2'}, {name: 'api2'}]) as SuccessResult[];
-            accounts.forEach(async (acc) => await api.delete('Account', acc.id));
-            console.log((await api.query('select id from Account')).totalSize);
-        });
-})()
