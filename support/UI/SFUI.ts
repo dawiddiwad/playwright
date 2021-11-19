@@ -1,24 +1,22 @@
 import { Page } from "@playwright/test";
 import { Modal } from "./Modal";
 import { readFile } from "fs";
+import { SANDBOX_CREDENTIALS } from "../../sfdx-auth/tools/SandboxPreparator";
 
 enum LoginInteruption {
     ConfirmIdentity = "LoginInterstitial",
     RegisterPhone = "AddPhoneNumber",
-    ClassicContext = "salesforce.com"
+    ClassicContext = "my.salesforce.com"
 }
-export class SFDCui {
-    private static  loginUrl:   string = '';
-    private static  username:   string = '';
-    private static  password:   string = '';
-    public  static  baseUrl:    string = '';
+export class SFDC {
+    private static credentials: SANDBOX_CREDENTIALS;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);
     }
 
-    private static getBaseUrlForLEX(): string {
-        return this.baseUrl.replace('my.salesforce.com', 'lightning.force.com');
+    private static switchToLEX(): string {
+        return `${this.credentials.baseUrl}/lightning/page/home`;
     }
 
     private static async checkInteruptions(page: Page): Promise<void> {
@@ -29,7 +27,7 @@ export class SFDCui {
             await page.click(Modal.skipPhoneRegistrationLink);
         }
         if (this.isOn(page, LoginInteruption.ClassicContext)) {
-            await page.goto(this.getBaseUrlForLEX());
+            await page.goto(this.switchToLEX(), {waitUntil: 'networkidle', timeout: 20000});
         }
     }
 
@@ -39,19 +37,21 @@ export class SFDCui {
                 throw new Error(`unable to read credentials.json due to:\n${error.message}`); 
             }
             data = JSON.parse(data.toString());
-            this.loginUrl   = String(data.loginUrl);
-            this.username   = String(data.username);
-            this.password   = String(data.password);
-            this.baseUrl    = String(data.baseUrl);
+            this.credentials = {
+                orgId: String(data.orgId),
+                url: String(data.url),
+                username: String(data.username),
+                baseUrl: String(data.baseUrl)
+            }
         })
     }
 
     public static async login(page: Page): Promise<void> {
-        await page.goto(`${this.loginUrl}?un=${this.username}&pw=${this.password}`);
+        await page.goto(this.credentials.url, {waitUntil: 'networkidle', timeout: 20000});
         await this.checkInteruptions(page);
     }
 
     public static async logout(page: Page): Promise<void> {
-        await page.goto(`${this.baseUrl}/secur/logout.jsp`);
+        await page.goto(`${this.credentials.baseUrl}/secur/logout.jsp`, {waitUntil: 'networkidle'});
     }
 }

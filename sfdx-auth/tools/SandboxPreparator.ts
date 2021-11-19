@@ -11,9 +11,9 @@ export interface SFDX_AUTH_URL {
 }
 
 export interface SANDBOX_CREDENTIALS {
-    loginUrl: string,
+    orgId: string,
+    url: string,
     username: string,
-    password: string,
     baseUrl: string
 }
 
@@ -30,7 +30,8 @@ export interface SANDBOX_DATA {
 
 export class SandboxPreparator {
     private repoUrl: string = "https://github.com/dawiddiwad";
-    private repository: string | undefined;
+    private repository: string;
+    private branch: string;
 
     protected sfdx: SFDX;
 
@@ -43,27 +44,30 @@ export class SandboxPreparator {
     private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
     private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository?: string) {
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
+        this.branch = branch;
         this.repository = repository;
-        this.Ready = new Promise(async (resolve) => {
-            await this.authorizeByAuthUrl(authUrl);
+
+        this.Ready = new Promise(async (resolve, reject) => {
+            await this.authorizeByAuthUrl(authUrl)
+                .catch((e) => reject(`unable to get sandbox ready due to:\n${e}`));
             resolve(this);
         });
     }
 
-    protected parseDefaultOrgDataFrom(authResponse: any): SANDBOX_DATA {
+    protected parseDefaultOrgDataFrom(data: any): SANDBOX_DATA {
         console.log("preparing org data...");
         try {
             return {
-                username: authResponse.username,
-                orgId: authResponse.orgId,
-                accessToken: authResponse.accessToken,
-                instanceUrl: authResponse.instanceUrl,
-                loginUrl: authResponse.loginUrl,
-                refreshToken: authResponse.refreshToken,
-                clientId: authResponse.clientId,
-                clientSecret: authResponse.clientSecret
+                username: data.username,
+                orgId: data.orgId,
+                accessToken: data.accessToken,
+                instanceUrl: data.instanceUrl,
+                loginUrl: data.loginUrl,
+                refreshToken: data.refreshToken,
+                clientId: data.clientId,
+                clientSecret: data.clientSecret
             };
         } catch (error) {
             throw new Error(`unable to parse sandbox data due to:\n${error}`);
@@ -81,8 +85,7 @@ export class SandboxPreparator {
                     '--setdefaultdevhubusername',
                     '--setdefaultusername',
                     '--json'
-                ],
-                log: true
+                ]
             });
             this.data = this.parseDefaultOrgDataFrom(response);
         } catch (e) {
@@ -92,30 +95,27 @@ export class SandboxPreparator {
 
     public async fetchCredentials(username?: string): Promise<SANDBOX_CREDENTIALS> {
         username = username ? username : this.data.username; 
-        console.log(`fetching credentials for org ${username}...`);
+        console.log(`fetching credentials for ${username}...`);
 
-        let orgData: any = await this.sfdx.exec({
-            cmd: 'force:org:display',
+        let credentials: any = await this.sfdx.exec({
+            cmd: 'force:org:open',
             f: [
                 `--targetusername ${username}`,
+                '--urlonly',
                 '--json'
-            ],
-            log: true
+            ]
         });
 
         return {
-            loginUrl: this.data.loginUrl,
-            username: username,
-            password: orgData.password,
-            baseUrl: orgData.instanceUrl,
+            orgId: credentials.orgId,
+            url: credentials.url,
+            username: credentials.username,
+            baseUrl: this.data.instanceUrl
         };
     }
 
     public async push() {
         console.log('pushing sources...');
-        if (!this.repository){
-            throw new Error("no repository set");
-        }
         process.chdir(`./${this.repository}`);
         await this.sfdx.exec({
             cmd: 'force:source:push',
@@ -129,19 +129,10 @@ export class SandboxPreparator {
         process.chdir('../');
     }
 
-    public async cloneRepository(branch: string, repository?: string): Promise<string> {
-        console.log(`cloning ${branch} branch of repository ${repository} ...`);
-
-        if (!repository && !this.repository){
-            throw new Error("no repository set");
-        } else if (!repository) {
-            repository = this.repository;
-        } else {
-            this.repository = repository;
-        }
-
+    public async cloneRepository(): Promise<string> {
+        console.log(`cloning ${this.branch} branch of repository ${this.repository} ...`);
         return new Promise<string>((repoCloned, failure) => {
-            const gitClone = exec(`git clone --branch ${branch} "${this.repoUrl}/${repository}.git"`);
+            const gitClone = exec(`git clone --branch ${this.branch} "${this.repoUrl}/${this.repository}.git"`);
             gitClone.on('exit', (code) =>
                 code !== 1 ? repoCloned('repository cloned sucesfully') : 'was not able to clone repository');
             gitClone.on('error', (error) =>

@@ -14,13 +14,17 @@ jobs:
       run: npm install
     - name: Install PW
       run: npx playwright install   
-    - name: install SFDX CLI and prepare credentials for sandbox org
+    - name: install SFDX CLI
       run: |
         wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
         mkdir ~/sfdx
         tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
         export PATH=~/sfdx/bin:$PATH
         sfdx plugins --core
+    - name: prepare scratch org
+      run: |
+        export PATH=~/sfdx/bin:$PATH
+        export NODE_NO_WARNINGS=1
         npx ts-node sfdx-auth/spinScratchOrg.ts ${{ secrets.DEVHUB_TOKEN }}
     - name: Run tests
       run: npm test
