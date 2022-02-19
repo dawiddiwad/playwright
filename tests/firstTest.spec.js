@@ -67,7 +67,7 @@ test.describe.parallel('SFDC-poc', () => {
         await SFDC.logout(page);
     });
 
-    test.only('Interact with iframe and shadowDom', async ({ page }) => {
+    test.skip('Interact with iframe and shadowDom', async ({ page }) => {
         test.slow();
         const appContext = "Sales";
 
