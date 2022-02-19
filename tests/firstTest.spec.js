@@ -67,7 +67,7 @@ test.describe.parallel('SFDC-poc', () => {
         await SFDC.logout(page);
     });
 
-    test('Interact with iframe and shadowDom', async ({ page }) => {
+    test.only('Interact with iframe and shadowDom', async ({ page }) => {
         test.slow();
         const appContext = "Sales";
 
@@ -76,6 +76,7 @@ test.describe.parallel('SFDC-poc', () => {
         await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
 
+        await page.click("//a[text()='LWC']");
         const elementHandle = await page.locator("//c-hello-world//iframe").elementHandle();
         const frame = await elementHandle.contentFrame();
         const shadowDomInputLocator = await frame.locator("recipe-hello-expressions ui-input input").first();

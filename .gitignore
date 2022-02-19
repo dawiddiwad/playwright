@@ -4,3 +4,4 @@ playwright-report
 *credentials.json
 *auth.json
 *authFile.json
+*DS_Store
