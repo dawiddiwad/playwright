@@ -1,6 +1,6 @@
 //@ts-check
 import { SuccessResult } from "jsforce";
-import { SFDCapi } from "../support/api/SFAPI";
+import { SFDCapi } from "../support/API/SFAPI";
 import { SFDC } from "../support/UI/SFUI";
 
 const { test, expect } = require('@playwright/test');
