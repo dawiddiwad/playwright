@@ -74,24 +74,27 @@ test.describe.parallel('SFDC-poc', () => {
         await SFDC.logout(page);
     });
 
-    test('Interact with iframe and shadowDom', async ({ page }) => {
+    test('Interact with shadowDom', async ({ page }) => {
         test.slow();
-        const appContext = "Sales";
 
-        await SFDC.login(page);
-        await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", { delay: 2000 });
-        await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
-        await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
+        await page.goto("https://recipes.lwc.dev/#hello");
 
-        const elementHandle = await page.locator("//c-hello-world//iframe").elementHandle();
-        const frame = await elementHandle.contentFrame();
-        const shadowDomInputLocator = await frame.locator("recipe-hello-expressions ui-input input").first();
-
+        const shadowDomInputLocator = await page.locator("recipe-hello-expressions ui-input input").first();
         const lwcInput = "znalazłem!";
         await shadowDomInputLocator.first().scrollIntoViewIfNeeded();
         await shadowDomInputLocator.first().type(lwcInput);
-        await expect(frame.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
-        await SFDC.logout(page);
+        await expect(page.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
+    });
+    test('Interact with iframe', async ({ page }) => {
+        test.slow();
+
+        await page.goto("https://allwebco-templates.com/support/S_script_IFrame.htm");
+
+        const elementHandle = await page.locator("//iframe[@name='Framename']").first().elementHandle();
+        const frame = await elementHandle.contentFrame();
+
+        await elementHandle.scrollIntoViewIfNeeded();
+        await expect(frame.locator("//img")).toHaveAttribute('src', 'picts/iframe.jpg');
     });
     test('Create -> Delete Account flow via API', async() => {
         const insertData = {
