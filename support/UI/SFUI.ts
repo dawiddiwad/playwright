@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 import { Modal } from "./Modal";
 import { readFile } from "fs";
-import { SANDBOX_CREDENTIALS } from "../../sfdx-auth/tools/SandboxPreparator";
+import { UI_CREDENTIALS } from "../../sfdx-auth/tools/SandboxPreparator";
 
 enum LoginInteruption {
     ConfirmIdentity = "LoginInterstitial",
@@ -9,7 +9,7 @@ enum LoginInteruption {
     ClassicContext = "my.salesforce.com"
 }
 export class SFDC {
-    private static credentials: SANDBOX_CREDENTIALS;
+    private static credentials: UI_CREDENTIALS;
 
     private static isOn(page: Page, interuption: LoginInteruption): boolean {
         return page.url().includes(interuption);

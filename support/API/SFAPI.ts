@@ -1,6 +1,6 @@
 import { Connection, ErrorResult, QueryResult, Record, RecordResult, RecordStream, SalesforceId, SObject, SuccessResult, UserInfo } from "jsforce";
 
-interface SFDC_CREDENTIALS {
+export interface API_CREDENTIALS {
     username: string,
     password: string
 }
@@ -10,7 +10,7 @@ export class SFDCapi {
     public Ready: Promise<SFDCapi>;
     public userInfo!: UserInfo;
 
-    constructor(credentials: SFDC_CREDENTIALS){
+    constructor(credentials: API_CREDENTIALS){
         this.conn = new Connection({});
         this.Ready = new Promise<SFDCapi>(async (connected, failure) => {
             try {
