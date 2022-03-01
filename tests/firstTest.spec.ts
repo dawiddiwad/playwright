@@ -17,7 +17,7 @@ test.beforeAll(async () => {
 })
 
 test.describe.parallel('SFDC-poc', () => {
-    test.skip('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page }) => {
+    test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page }) => {
         test.slow();
         const salesConsole = "Sales Console";
         const overdueTasks = "Overdue Tasks";
@@ -57,7 +57,7 @@ test.describe.parallel('SFDC-poc', () => {
         await SFDC.logout(page);
     });
 
-    test.skip('Interact with LWC', async ({ page }) => {
+    test('Interact with LWC', async ({ page }) => {
         test.slow();
         const appContext = "Sales";
         await SFDC.login(page);
@@ -74,7 +74,7 @@ test.describe.parallel('SFDC-poc', () => {
         await SFDC.logout(page);
     });
 
-    test.skip('Interact with shadowDom', async ({ page }) => {
+    test('Interact with shadowDom', async ({ page }) => {
         test.slow();
 
         await page.goto("https://recipes.lwc.dev/#hello");
@@ -85,7 +85,7 @@ test.describe.parallel('SFDC-poc', () => {
         await shadowDomInputLocator.first().type(lwcInput);
         await expect(page.locator("recipe-hello-expressions ui-card div p")).toContainText(lwcInput.toUpperCase());
     });
-    test.skip('Interact with iframe', async ({ page }) => {
+    test('Interact with iframe', async ({ page }) => {
         test.slow();
 
         await page.goto("https://allwebco-templates.com/support/S_script_IFrame.htm");
@@ -96,7 +96,7 @@ test.describe.parallel('SFDC-poc', () => {
         await elementHandle.scrollIntoViewIfNeeded();
         await expect(frame.locator("//img")).toHaveAttribute('src', 'picts/iframe.jpg');
     });
-    test.skip('Create -> Delete Account flow via API', async() => {
+    test('Create -> Delete Account flow via API', async() => {
         const insertData = {
             Name: 'cucumber table',
             BillingCity: 'Piździszew dolny',
