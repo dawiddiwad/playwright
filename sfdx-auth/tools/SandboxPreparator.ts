@@ -1,7 +1,7 @@
-import { SFDX } from "./sfdx";
+import { SFDX } from "./SFDX";
 import { exec } from "child_process";
 import { writeFile } from "fs/promises";
-import { API_CREDENTIALS } from "../../support/API/SFAPI";
+import { API_CREDENTIALS } from "../../support/API/SFDC_API";
 
 export enum ORG {
     SANDBOX,
@@ -11,9 +11,9 @@ export interface SFDX_AUTH_URL {
     url: string
 }
 
-export interface UI_CREDENTIALS {
+export interface DEVHUB_CREDENTIALS {
     orgId: string,
-    url: string,
+    loginUrl: string,
     username: string,
     baseUrl: string
 }
@@ -100,7 +100,7 @@ export class SandboxPreparator {
         }
     }
 
-    public async fetchCredentials(username?: string): Promise<UI_CREDENTIALS> {
+    public async fetchCredentials(username?: string): Promise<DEVHUB_CREDENTIALS> {
         username = username ? username : this.data.username; 
         console.log(`fetching credentials for ${username}...`);
 
@@ -115,7 +115,7 @@ export class SandboxPreparator {
 
         return {
             orgId: credentials.orgId,
-            url: credentials.url,
+            loginUrl: credentials.url,
             username: credentials.username,
             baseUrl: this.data.instanceUrl
         };
@@ -147,7 +147,7 @@ export class SandboxPreparator {
         });
     }
 
-    public async credentialsFile(data: UI_CREDENTIALS): Promise<UI_CREDENTIALS> {
+    public async credentialsFile(data: DEVHUB_CREDENTIALS): Promise<DEVHUB_CREDENTIALS> {
         console.log("writing crednetials file...");
         await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(data));
         if (this.apiCredentials && this.apiCredentials.password && this.apiCredentials.username){

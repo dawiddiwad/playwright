@@ -5,14 +5,14 @@ export interface API_CREDENTIALS {
     password: string
 }
 
-export class SFDCapi {
+export class SFDC_API {
     private conn: Connection;
-    public Ready: Promise<SFDCapi>;
+    public Ready: Promise<SFDC_API>;
     public userInfo!: UserInfo;
 
     constructor(credentials: API_CREDENTIALS){
         this.conn = new Connection({});
-        this.Ready = new Promise<SFDCapi>(async (connected, failure) => {
+        this.Ready = new Promise<SFDC_API>(async (connected, failure) => {
             try {
                 this.userInfo = await this.conn.login(credentials.username, credentials.password);
                 connected(this);

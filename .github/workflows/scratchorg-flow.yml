@@ -1,0 +1,36 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  scratch-org-tests:
+    runs-on: ubuntu-latest # or macos-latest, windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - name: Install project dependencies
+      run: npm install
+    - name: Install PW
+      run: npx playwright install   
+    - name: install SFDX CLI
+      run: |
+        wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+        mkdir ~/sfdx
+        tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+        export PATH=~/sfdx/bin:$PATH
+        sfdx plugins --core
+    - name: prepare scratch org
+      run: |
+        export PATH=~/sfdx/bin:$PATH
+        export NODE_NO_WARNINGS=1
+        npx ts-node sfdx-auth/dev-hub-flow/ScratchOrgSpinner.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.API_USERNAME }} ${{ secrets.API_PASSWORD }} 
+    - name: Run tests
+      run: npm run test-devhub-flow
+    - uses: actions/upload-artifact@v2
+      if: ${{ failure() }}
+      with:
+        name: playwright-test-report
+        path: test-results/**
+        retention-days: 1

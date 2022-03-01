@@ -1,4 +1,4 @@
-import { API_CREDENTIALS } from "../../support/API/SFAPI";
+import { API_CREDENTIALS } from "../../support/API/SFDC_API";
 import { SandboxPreparator, SFDX_AUTH_URL } from "./SandboxPreparator";
 
 export class ScratchPreparator extends SandboxPreparator {

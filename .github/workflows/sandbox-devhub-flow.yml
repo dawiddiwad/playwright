@@ -2,8 +2,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  scratch-org-tests:
-    runs-on: ubuntu-latest # or macos-latest, windows-latest
+  sandbox-org-tests:
+    runs-on: ubuntu-latest # or macos-latest, windows-latest ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -14,20 +14,19 @@ jobs:
       run: npm install
     - name: Install PW
       run: npx playwright install   
-    - name: install SFDX CLI
+    - name: install SFDX CLI and prepare credentials for sandbox org
       run: |
         wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
         mkdir ~/sfdx
         tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
         export PATH=~/sfdx/bin:$PATH
         sfdx plugins --core
-    - name: prepare scratch org
+    - name: prepare sandbox
       run: |
         export PATH=~/sfdx/bin:$PATH
-        export NODE_NO_WARNINGS=1
-        npx ts-node sfdx-auth/spinScratchOrg.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.API_USERNAME }} ${{ secrets.API_PASSWORD }} 
+        npx ts-node sfdx-auth/dev-hub-flow/SandboxSpinner.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.API_USERNAME }} ${{ secrets.API_PASSWORD }}        
     - name: Run tests
-      run: npm test
+      run: npm run test-devhub-flow
     - uses: actions/upload-artifact@v2
       if: ${{ failure() }}
       with:

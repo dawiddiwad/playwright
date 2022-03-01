@@ -1,5 +1,5 @@
-import { API_CREDENTIALS } from "../support/API/SFAPI";
-import { SandboxPreparator } from "./tools/SandboxPreparator";
+import { API_CREDENTIALS } from "../../support/API/SFDC_API";
+import { SandboxPreparator } from "../tools/SandboxPreparator";
 
 const token = process.argv[2]; //sfdxAuthUrl from 'sfdx force:org:display --verbose --json'
 const apiCredentials: API_CREDENTIALS = {
@@ -10,7 +10,6 @@ const sandbox = new SandboxPreparator('sfdx', { url: token }, 'salesforce-test-o
 (async () => {
     try {
         console.log('preparing sandbox for testing:');
-        console.log(token);
         await sandbox.Ready.then(async (org) => {
             await org.credentialsFile(await org.fetchCredentials());
         })

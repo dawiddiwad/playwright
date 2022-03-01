@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
-    "test-headed": "npx playwright test --headed"
+    "test-headed": "npx playwright test --headed",
+    "test-cred-flow": "npx playwright test tests/prod_poc_creds_flow.spec.ts",
+    "test-devhub-flow": "npx playwright test tests/prod_poc_devhub_fow.spec.ts"
   },
   "keywords": [],
   "author": "",
