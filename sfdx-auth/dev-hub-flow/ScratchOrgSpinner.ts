@@ -1,6 +1,5 @@
-import { Client } from 'sfdx-js';
-import { API_CREDENTIALS } from '../support/API/SFAPI';
-import { ScratchPreparator } from './tools/ScratchPreparator';
+import { API_CREDENTIALS } from '../../support/API/SFDC_API';
+import { ScratchPreparator } from '../tools/ScratchPreparator';
 
 
 (async () => {

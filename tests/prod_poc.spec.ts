@@ -1,77 +1,78 @@
 //@ts-check
 import { SuccessResult } from "jsforce";
-import { SFDCapi } from "../support/API/SFAPI";
-import { SFDC } from "../support/UI/SFUI";
+import { SFDC_API } from "../support/API/SFDC_API";
+import { LoginFlow, SFDC_UI } from "../support/UI/SFDC_UI";
 
 const { test, expect } = require('@playwright/test');
-const { Details } = require('../support/UI/Details');
-const { NavigationBar } = require('../support/UI/NavigationBar');
+const { Details } = require('../support/UI/locators/Details');
+const { NavigationBar } = require('../support/UI/locators/NavigationBar');
 const { readFile } = require('fs/promises');
 
-let api: SFDCapi;
+let api: SFDC_API;
+let ui: SFDC_UI;
 
 test.beforeAll(async () => {
     const credentials = JSON.parse((await readFile('sfdx-auth/api_credentials.json')).toString());
-    api = await new SFDCapi({username: credentials.username, password: credentials.password}).Ready;
-    await SFDC.init();
+    api = await new SFDC_API({username: credentials.username, password: credentials.password}).Ready;
+    ui = await new SFDC_UI(LoginFlow.Credentials).Ready;
 })
 
-test.describe.parallel('SFDC-poc', () => {
-    test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page }) => {
+test.describe.parallel('SFDC-prod-poc', () => {
+    test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page: sfdc }) => {
         test.slow();
         const salesConsole = "Sales Console";
         const overdueTasks = "Overdue Tasks";
-        await SFDC.login(page);        
-        await page.click(NavigationBar.appLauncherIcon, {delay:2000});
-        await page.fill(NavigationBar.appLauncherSearch, salesConsole);
-        await page.click(NavigationBar.selectApplication(salesConsole));
-        await page.click(NavigationBar.tabsNavigationMenu);
-        await page.click(NavigationBar.tabsNavigationMenuItem("Tasks"));
-        await page.click(Details.selectListViewButton);
-        await page.click(Details.selectListViewItem(overdueTasks));
-        const taskView =  page.locator(`//li[descendant::*[contains(text(), '${overdueTasks}')]]`);
+        await ui.loginUsingLoginPage(sfdc, 'dawid89dobrowolski@brave-wolf-qm0gmg.com');        
+        await sfdc.click(NavigationBar.appLauncherIcon, {delay:2000});
+        await sfdc.fill(NavigationBar.appLauncherSearch, salesConsole);
+        await sfdc.click(NavigationBar.selectApplication(salesConsole));
+        await sfdc.click(NavigationBar.tabsNavigationMenu);
+        await sfdc.click(NavigationBar.tabsNavigationMenuItem("Tasks"));
+        await sfdc.click(Details.selectListViewButton);
+        await sfdc.click(Details.selectListViewItem(overdueTasks));
+        const taskView =  sfdc.locator(`//li[descendant::*[contains(text(), '${overdueTasks}')]]`);
         await expect(taskView).toContainText(overdueTasks);
 
         const taskSubject = "playwright poc tests"
-        await page.click("//a[contains(@title, 'action') and not(contains(@title, 'actions'))] | //ul[contains(@class, 'utilitybar')]");
-        await page.click(Details.newTaskButton);
-        await page.click("//a[ancestor::*[preceding-sibling::span[descendant::*[contains(text(), 'Status')]]]]");
-        await page.click(`//a[contains(@title, 'In Progress')]`);
-        await page.fill("//input[ancestor::*[preceding-sibling::label[contains(text(), 'Subject')]]]", taskSubject);
-        await page.click("//button[@title = 'Save']");
-        const saveConfirmToast = page.locator("//div[contains(@class, 'slds-notify--toast')]");
+        await sfdc.click("//a[contains(@title, 'action') and not(contains(@title, 'actions'))] | //ul[contains(@class, 'utilitybar')]");
+        await sfdc.click(Details.newTaskButton);
+        await sfdc.click("//a[ancestor::*[preceding-sibling::span[descendant::*[contains(text(), 'Status')]]]]");
+        await sfdc.click(`//a[contains(@title, 'In Progress')]`);
+        await sfdc.fill("//input[ancestor::*[preceding-sibling::label[contains(text(), 'Subject')]]]", taskSubject);
+        await sfdc.click("//button[@title = 'Save']");
+        const saveConfirmToast = sfdc.locator("//div[contains(@class, 'slds-notify--toast')]");
         await expect(saveConfirmToast).toContainText(`Task ${taskSubject} was created.`);
 
-        await page.click("(//li//a[contains(@title, 'actions')])");
-        await page.click("//a[contains(@title, 'Delete')]");
+        await sfdc.click("(//li//a[contains(@title, 'actions')])");
+        await sfdc.click("//a[contains(@title, 'Delete')]");
         const deleteConfirmationModal = {
-            header: page.locator("//div[contains(@class, 'modal-header')]"),
-            body: page.locator("//div[contains(@class, 'modal-body')]")
+            header: sfdc.locator("//div[contains(@class, 'modal-header')]"),
+            body: sfdc.locator("//div[contains(@class, 'modal-body')]")
         }
         await expect(deleteConfirmationModal.header).toContainText('Delete Task');
         await expect(deleteConfirmationModal.body).toContainText('Are you sure you want to delete this task?');
-        await page.click("//button[descendant::span[contains(text(), 'Delete')]]");
+        await sfdc.click("//button[descendant::span[contains(text(), 'Delete')]]");
 
-        const deleteConfirmToast = page.locator("//div[contains(@class, 'slds-notify--toast')]");
+        const deleteConfirmToast = sfdc.locator("//div[contains(@class, 'slds-notify--toast')]");
         await expect(deleteConfirmToast.first()).toContainText(`Task "${taskSubject}" was deleted.`);
-        await SFDC.logout(page);
+        await ui.logout(sfdc);
     });
 
-    test('Interact with LWC', async ({ page }) => {
+    test('Interact with LWC', async ({ page: sfdc }) => {
         test.slow();
         const appContext = "Sales";
-        await SFDC.login(page);
-        await page.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
-        await page.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
-        await page.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
+        await ui.loginUsingLoginPage(sfdc, 'dawid89dobrowolski@brave-wolf-qm0gmg.com');    
+        await sfdc.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
+        await sfdc.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
+        await sfdc.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);
 
         const lwcOutput = "//p[contains(text(), 'LWC')]";
-        await expect(page.locator(lwcOutput)).toContainText(`bardzo!`);
+        await expect(sfdc.locator(lwcOutput)).toContainText(`bardzo!`);
 
         const lwcInput = "a cypress jeszcze lepszy";
-        await page.fill("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput);
-        await expect(page.locator(lwcOutput)).toContainText(`LWC zajebiste jest, ${lwcInput}!`);
-        await SFDC.logout(page);
+        await sfdc.fill("//input[ancestor::lightning-input[descendant::*[contains(text(),'Name')]]]", lwcInput);
+        await expect(sfdc.locator(lwcOutput)).toContainText(`LWC zajebiste jest, ${lwcInput}!`);
+        await ui.logout(sfdc);
     });
 
     test('Interact with shadowDom', async ({ page }) => {
