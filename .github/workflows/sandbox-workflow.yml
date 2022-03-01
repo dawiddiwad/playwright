@@ -24,7 +24,7 @@ jobs:
     - name: prepare sandbox
       run: |
         export PATH=~/sfdx/bin:$PATH
-        npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }}   
+        npx ts-node sfdx-auth/authSandbox.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.API_USERNAME }} ${{ secrets.API_PASSWORD }}        
     - name: Run tests
       run: npm test
     - uses: actions/upload-artifact@v2

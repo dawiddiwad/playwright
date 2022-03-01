@@ -1,6 +1,7 @@
 import { SFDX } from "./sfdx";
 import { exec } from "child_process";
 import { writeFile } from "fs/promises";
+import { API_CREDENTIALS } from "../../support/API/SFAPI";
 
 export enum ORG {
     SANDBOX,
@@ -10,7 +11,7 @@ export interface SFDX_AUTH_URL {
     url: string
 }
 
-export interface SANDBOX_CREDENTIALS {
+export interface UI_CREDENTIALS {
     orgId: string,
     url: string,
     username: string,
@@ -32,6 +33,7 @@ export class SandboxPreparator {
     private repoUrl: string = "https://github.com/dawiddiwad";
     private repository: string;
     private branch: string;
+    private apiCredentials?: API_CREDENTIALS;
 
     protected sfdx: SFDX;
 
@@ -43,11 +45,16 @@ export class SandboxPreparator {
 
     private static AUTH_FILE_PATH: string = "./sfdx-auth/auth.json";
     private static CREDENTIALS_FILE_PATH: string = "./sfdx-auth/credentials.json";
+    private static API_CREDENTIALS_FILE_PATH: string = "./sfdx-auth/api_credentials.json";
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string) {
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string, apiCredentials?: API_CREDENTIALS) {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
         this.branch = branch;
         this.repository = repository;
+
+        if (apiCredentials){
+            this.apiCredentials = apiCredentials;
+        }
 
         this.Ready = new Promise(async (resolve, reject) => {
             await this.authorizeByAuthUrl(authUrl)
@@ -93,7 +100,7 @@ export class SandboxPreparator {
         }
     }
 
-    public async fetchCredentials(username?: string): Promise<SANDBOX_CREDENTIALS> {
+    public async fetchCredentials(username?: string): Promise<UI_CREDENTIALS> {
         username = username ? username : this.data.username; 
         console.log(`fetching credentials for ${username}...`);
 
@@ -140,9 +147,12 @@ export class SandboxPreparator {
         });
     }
 
-    public async credentialsFile(data: SANDBOX_CREDENTIALS): Promise<SANDBOX_CREDENTIALS> {
+    public async credentialsFile(data: UI_CREDENTIALS): Promise<UI_CREDENTIALS> {
         console.log("writing crednetials file...");
         await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(data));
+        if (this.apiCredentials && this.apiCredentials.password && this.apiCredentials.username){
+            await writeFile(SandboxPreparator.API_CREDENTIALS_FILE_PATH, JSON.stringify(this.apiCredentials));
+        }
         return data;
     }
 }

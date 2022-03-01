@@ -1,9 +1,15 @@
 import { Client } from 'sfdx-js';
+import { API_CREDENTIALS } from '../support/API/SFAPI';
 import { ScratchPreparator } from './tools/ScratchPreparator';
+
 
 (async () => {
     console.log('preparing scratch org for testing:');
-    const scratchOrg = new ScratchPreparator('sfdx', { url: process.argv[2] }, 'salesforce-test-org', 'develop');
+    const apiCredentials: API_CREDENTIALS = {
+        username: process.argv[3],
+        password: process.argv[4]
+    }
+    const scratchOrg = new ScratchPreparator('sfdx', { url: process.argv[2] }, 'salesforce-test-org', 'develop', apiCredentials);
     try {
         await scratchOrg.Ready.then(async (org) => {
             await org.push();

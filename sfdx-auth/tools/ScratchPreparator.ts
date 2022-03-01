@@ -1,11 +1,12 @@
+import { API_CREDENTIALS } from "../../support/API/SFAPI";
 import { SandboxPreparator, SFDX_AUTH_URL } from "./SandboxPreparator";
 
 export class ScratchPreparator extends SandboxPreparator {
     public Ready: Promise<ScratchPreparator>;
     private static DEFINITION_FILE_PATH: string = './salesforce-test-org/config/project-scratch-def.json';
 
-    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string) {
-        super(sfdxEnvPathVariable, authUrl, repository, branch);
+    constructor(sfdxEnvPathVariable: string, authUrl: SFDX_AUTH_URL, repository: string, branch: string, apiCredentials?: API_CREDENTIALS) {
+        super(sfdxEnvPathVariable, authUrl, repository, branch, apiCredentials);
 
         this.Ready = new Promise(async (resolve, reject) => {
             try {
