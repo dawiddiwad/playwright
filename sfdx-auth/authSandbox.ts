@@ -9,6 +9,7 @@ const apiCredentials: API_CREDENTIALS = {
 const sandbox = new SandboxPreparator('sfdx', { url: token }, 'salesforce-test-org', 'develop', apiCredentials);
 (async () => {
     try {
+        console.log(token);
         console.log('preparing sandbox for testing:');
         console.log(token);
         await sandbox.Ready.then(async (org) => {
