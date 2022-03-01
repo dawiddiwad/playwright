@@ -33,7 +33,7 @@ export class SandboxPreparator {
     private repoUrl: string = "https://github.com/dawiddiwad";
     private repository: string;
     private branch: string;
-    private apiCredentials: API_CREDENTIALS;
+    private apiCredentials?: API_CREDENTIALS;
 
     protected sfdx: SFDX;
 
@@ -51,7 +51,10 @@ export class SandboxPreparator {
         this.sfdx = new SFDX(sfdxEnvPathVariable);
         this.branch = branch;
         this.repository = repository;
-        this.apiCredentials = apiCredentials;
+
+        if (apiCredentials){
+            this.apiCredentials = apiCredentials;
+        }
 
         this.Ready = new Promise(async (resolve, reject) => {
             await this.authorizeByAuthUrl(authUrl)
@@ -147,7 +150,7 @@ export class SandboxPreparator {
     public async credentialsFile(data: UI_CREDENTIALS): Promise<UI_CREDENTIALS> {
         console.log("writing crednetials file...");
         await writeFile(SandboxPreparator.CREDENTIALS_FILE_PATH, JSON.stringify(data));
-        if (this.apiCredentials.password && this.apiCredentials.username){
+        if (this.apiCredentials && this.apiCredentials.password && this.apiCredentials.username){
             await writeFile(SandboxPreparator.API_CREDENTIALS_FILE_PATH, JSON.stringify(this.apiCredentials));
         }
         return data;
