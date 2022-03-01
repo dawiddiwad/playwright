@@ -14,15 +14,15 @@ let ui: SFDC_UI;
 test.beforeAll(async () => {
     const credentials = JSON.parse((await readFile('sfdx-auth/api_credentials.json')).toString());
     api = await new SFDC_API({username: credentials.username, password: credentials.password}).Ready;
-    ui = await new SFDC_UI(LoginFlow.Credentials).Ready;
+    ui = await new SFDC_UI(LoginFlow.DevHub).Ready;
 })
 
-test.describe.parallel('SFDC-prod-poc', () => {
+test.describe.parallel('SFDC-prod-poc-devhub-flow', () => {
     test('Open Overdue Tasks listview -> Create -> Delete Task flow', async ({ page: sfdc }) => {
         test.slow();
         const salesConsole = "Sales Console";
         const overdueTasks = "Overdue Tasks";
-        await ui.loginUsingLoginPage(sfdc, 'dawid89dobrowolski@brave-wolf-qm0gmg.com');        
+        await ui.login(sfdc);        
         await sfdc.click(NavigationBar.appLauncherIcon, {delay:2000});
         await sfdc.fill(NavigationBar.appLauncherSearch, salesConsole);
         await sfdc.click(NavigationBar.selectApplication(salesConsole));
@@ -61,7 +61,7 @@ test.describe.parallel('SFDC-prod-poc', () => {
     test('Interact with LWC', async ({ page: sfdc }) => {
         test.slow();
         const appContext = "Sales";
-        await ui.loginUsingLoginPage(sfdc, 'dawid89dobrowolski@brave-wolf-qm0gmg.com');    
+        await ui.login(sfdc);  
         await sfdc.click("//button[descendant::*[contains(text(), 'App Launcher')]]", {delay:2000});
         await sfdc.fill("//input[contains(@type, 'search') and ancestor::one-app-launcher-menu]", appContext);
         await sfdc.click(`//one-app-launcher-menu-item[descendant::*[@*='${appContext}']]`);

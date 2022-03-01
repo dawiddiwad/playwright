@@ -27,7 +27,7 @@ jobs:
         export NODE_NO_WARNINGS=1
         npx ts-node sfdx-auth/dev-hub-flow/ScratchOrgSpinner.ts ${{ secrets.DEVHUB_TOKEN }} ${{ secrets.API_USERNAME }} ${{ secrets.API_PASSWORD }} 
     - name: Run tests
-      run: npm test
+      run: npm run test-devhub-flow
     - uses: actions/upload-artifact@v2
       if: ${{ failure() }}
       with:

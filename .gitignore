@@ -1,6 +1,7 @@
 node_modules
 test-results
 playwright-report
-*credentials.json
+sfdx-auth/credentials.json
+*api_credentials.json
 *auth.json
 *authFile.json

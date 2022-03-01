@@ -10,7 +10,6 @@ const sandbox = new SandboxPreparator('sfdx', { url: token }, 'salesforce-test-o
 (async () => {
     try {
         console.log('preparing sandbox for testing:');
-        console.log(token);
         await sandbox.Ready.then(async (org) => {
             await org.credentialsFile(await org.fetchCredentials());
         })
